@@ -167,7 +167,16 @@ function givePkmn(poke, level) {
 
     poke.ability = learnPkmnAbility(poke.id);
 
-    if (rng(saved.gamemodShiny == true ? 1/40 : 1/400)) poke.shiny = true
+    let probShiny = saved.gamemodShiny == true ? 1/40 : 1/400;
+    if (typeof Progreso !== 'undefined') probShiny *= Progreso.mult('shinyPct');
+    if (typeof Combate2 !== 'undefined') probShiny *= Combate2.multBendicion('shinyPct');
+    const saleShiny = rng(probShiny);
+    if (saleShiny) poke.shiny = true;
+    if (typeof Extras !== 'undefined') {
+        Extras.registrarEncuentro(saleShiny);
+        Extras.contar('capturas');
+        Extras.sonar(saleShiny ? 'variocolor' : 'captura');
+    }
 
 
 
@@ -189,6 +198,11 @@ let currentTrainerSlot = 1
 let currentTrainingWave = 0
 
 function setWildPkmn(){
+
+    if (typeof Combate2 !== 'undefined') {
+        Combate2.varianteActual = Combate2.sortearVariante()
+        setTimeout(() => Combate2.actualizarEficacia(), 60)
+    }
 
     barProgressWild = 0
     exploreCombatWildTurn = 1  
@@ -623,7 +637,7 @@ while (randomMoves.length < 4) randomMoves.push(undefined);
               class="pkmn-movebox-progress"
               style="background: ${returnTypeColor(move[i].type)}"></div>
          <span>${format(i)}${signatureIcon}</span>
-         <img style="background: ${returnTypeColor(move[i].type)}"
+         <img alt="" style="background: ${returnTypeColor(move[i].type)}"
               src="img/icons/${move[i].type}.svg">`;
 
      divMove.dataset.move = i;
@@ -660,8 +674,8 @@ function updateItemsGot(){
 
         divItem.dataset.item = i
 
-        if (item[i].type !== "tm") divItem.innerHTML = `<img src="img/items/${i}.png"> <span>x${item[i].newItem}</span>`;
-        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${format(move[item[i].move].type)}.png"> <span>x${item[i].newItem}</span>`;
+        if (item[i].type !== "tm") divItem.innerHTML = `<img alt="" src="img/items/${i}.png"> <span>x${item[i].newItem}</span>`;
+        if (item[i].type == "tm") divItem.innerHTML = `<img alt="" src="img/items/tm${format(move[item[i].move].type)}.png"> <span>x${item[i].newItem}</span>`;
 
 
         document.getElementById("explore-drops").appendChild(divItem);
@@ -1011,8 +1025,8 @@ function leaveCombat(){
         const divItem = document.createElement("div");
         divItem.className = "area-end-item";
         divItem.dataset.item = i
-        if (item[i].type !== "tm") divItem.innerHTML = `<img src="img/items/${i}.png"><span>+${item[i].newItem}</span>`;
-        if (item[i].type == "tm") divItem.innerHTML = `<img src="img/items/tm${format(move[item[i].move].type)}.png"><span>+${item[i].newItem}</span>`;
+        if (item[i].type !== "tm") divItem.innerHTML = `<img alt="" src="img/items/${i}.png"><span>+${item[i].newItem}</span>`;
+        if (item[i].type == "tm") divItem.innerHTML = `<img alt="" src="img/items/tm${format(move[item[i].move].type)}.png"><span>+${item[i].newItem}</span>`;
         document.getElementById("area-end-item-list").appendChild(divItem);
 
         item[i].newItem = 0;
@@ -1107,8 +1121,8 @@ function leaveCombat(){
 
     if (saved.hideGotPkmn == "true" && divTag=="") continue
 
-    divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/sprite/${hatchedPkmn}.png">`+divTag;
-    if (divTag == `<span>✦¡Variocolor!✦</span>`) divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/shiny/${hatchedPkmn}.png">`+divTag;
+    divPkmn.innerHTML = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${hatchedPkmn}.png">`+divTag;
+    if (divTag == `<span>✦¡Variocolor!✦</span>`) divPkmn.innerHTML = `<img alt="" class="sprite-trim" src="img/pkmn/shiny/${hatchedPkmn}.png">`+divTag;
     document.getElementById("area-end-pkmn-list").appendChild(divPkmn);
 
     noPkmn = false
@@ -1180,8 +1194,8 @@ function leaveCombat(){
 
 
 
-    divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/sprite/${i}.png">`+divTag;
-    if (divTag == `<span>✦¡Variocolor!✦</span>`) divPkmn.innerHTML = `<img class="sprite-trim" src="img/pkmn/shiny/${i}.png">`+divTag;
+    divPkmn.innerHTML = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${i}.png">`+divTag;
+    if (divTag == `<span>✦¡Variocolor!✦</span>`) divPkmn.innerHTML = `<img alt="" class="sprite-trim" src="img/pkmn/shiny/${i}.png">`+divTag;
     document.getElementById("area-end-pkmn-list").appendChild(divPkmn);
 
 
@@ -1241,7 +1255,7 @@ function leaveCombat(){
         document.getElementById("area-refight").style.display = "flex"
         document.getElementById("area-refight").innerHTML = `
         <svg style="margin-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M10.797 2.482a.61.61 0 0 1 0 .866L9.44 4.705h.924c1.393 0 2.305.572 2.845 1.343c.515.736.651 1.593.651 2.153c0 .561-.136 1.418-.651 2.154c-.54.77-1.452 1.342-2.845 1.342c-.948 0-1.695-.48-2.295-1.08c-.584-.584-1.093-1.347-1.56-2.046l-.019-.03c-.49-.734-.936-1.4-1.425-1.889c-.481-.48-.935-.721-1.429-.721c-1.01 0-1.54.39-1.84.82c-.327.466-.43 1.05-.43 1.45s.103.985.43 1.451c.3.43.83.82 1.84.82c.512 0 .982-.259 1.482-.775a.613.613 0 0 1 .88.852c-.612.632-1.379 1.148-2.362 1.148c-1.393 0-2.305-.571-2.845-1.342C.276 9.619.14 8.762.14 8.2s.137-1.418.651-2.153c.54-.77 1.452-1.343 2.845-1.343c.948 0 1.695.48 2.295 1.08c.584.585 1.093 1.348 1.56 2.047l.019.03c.49.734.936 1.4 1.425 1.889c.481.48.935.721 1.429.721c1.01 0 1.54-.39 1.84-.82c.327-.466.43-1.05.43-1.45s-.103-.986-.43-1.451c-.3-.43-.83-.82-1.84-.82H7.961a.613.613 0 0 1-.433-1.046L9.93 2.482a.61.61 0 0 1 .866 0" clip-rule="evenodd"/></svg>
-        Revancha automática <span> (necesita un <img src="img/items/autoRefightTicket.png"> Ticket de Revancha)</span>
+        Revancha automática <span> (necesita un <img alt="" src="img/items/autoRefightTicket.png"> Ticket de Revancha)</span>
         `
         
     }
@@ -1249,7 +1263,7 @@ function leaveCombat(){
         document.getElementById("area-refight").style.display = "flex"
         document.getElementById("area-refight").innerHTML = `
         <svg style="margin-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M10.797 2.482a.61.61 0 0 1 0 .866L9.44 4.705h.924c1.393 0 2.305.572 2.845 1.343c.515.736.651 1.593.651 2.153c0 .561-.136 1.418-.651 2.154c-.54.77-1.452 1.342-2.845 1.342c-.948 0-1.695-.48-2.295-1.08c-.584-.584-1.093-1.347-1.56-2.046l-.019-.03c-.49-.734-.936-1.4-1.425-1.889c-.481-.48-.935-.721-1.429-.721c-1.01 0-1.54.39-1.84.82c-.327.466-.43 1.05-.43 1.45s.103.985.43 1.451c.3.43.83.82 1.84.82c.512 0 .982-.259 1.482-.775a.613.613 0 0 1 .88.852c-.612.632-1.379 1.148-2.362 1.148c-1.393 0-2.305-.571-2.845-1.342C.276 9.619.14 8.762.14 8.2s.137-1.418.651-2.153c.54-.77 1.452-1.343 2.845-1.343c.948 0 1.695.48 2.295 1.08c.584.585 1.093 1.348 1.56 2.047l.019.03c.49.734.936 1.4 1.425 1.889c.481.48.935.721 1.429.721c1.01 0 1.54-.39 1.84-.82c.327-.466.43-1.05.43-1.45s-.103-.986-.43-1.451c-.3-.43-.83-.82-1.84-.82H7.961a.613.613 0 0 1-.433-1.046L9.93 2.482a.61.61 0 0 1 .866 0" clip-rule="evenodd"/></svg>
-        Revancha automática <span> (no gastará <img src="img/items/autoRefightTicket.png"> Tickets de Revancha)</span>
+        Revancha automática <span> (no gastará <img alt="" src="img/items/autoRefightTicket.png"> Tickets de Revancha)</span>
         `
     } 
 
@@ -1257,7 +1271,7 @@ function leaveCombat(){
         document.getElementById("area-refight").style.display = "flex"
         document.getElementById("area-refight").innerHTML = `
         <svg style="margin-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M10.797 2.482a.61.61 0 0 1 0 .866L9.44 4.705h.924c1.393 0 2.305.572 2.845 1.343c.515.736.651 1.593.651 2.153c0 .561-.136 1.418-.651 2.154c-.54.77-1.452 1.342-2.845 1.342c-.948 0-1.695-.48-2.295-1.08c-.584-.584-1.093-1.347-1.56-2.046l-.019-.03c-.49-.734-.936-1.4-1.425-1.889c-.481-.48-.935-.721-1.429-.721c-1.01 0-1.54.39-1.84.82c-.327.466-.43 1.05-.43 1.45s.103.985.43 1.451c.3.43.83.82 1.84.82c.512 0 .982-.259 1.482-.775a.613.613 0 0 1 .88.852c-.612.632-1.379 1.148-2.362 1.148c-1.393 0-2.305-.571-2.845-1.342C.276 9.619.14 8.762.14 8.2s.137-1.418.651-2.153c.54-.77 1.452-1.343 2.845-1.343c.948 0 1.695.48 2.295 1.08c.584.585 1.093 1.348 1.56 2.047l.019.03c.49.734.936 1.4 1.425 1.889c.481.48.935.721 1.429.721c1.01 0 1.54-.39 1.84-.82c.327-.466.43-1.05.43-1.45s-.103-.986-.43-1.451c-.3-.43-.83-.82-1.84-.82H7.961a.613.613 0 0 1-.433-1.046L9.93 2.482a.61.61 0 0 1 .866 0" clip-rule="evenodd"/></svg>
-        Revancha automática <span> (no gastará <img src="img/items/autoRefightTicket.png"> Tickets de Revancha)</span>
+        Revancha automática <span> (no gastará <img alt="" src="img/items/autoRefightTicket.png"> Tickets de Revancha)</span>
         `
     }
 
@@ -1550,7 +1564,11 @@ for (let i = activeBars; i < hpBars.length; i++) {
     for (const buff in wildBuffs){ if ( wildBuffs[buff]>0) wildBuffs[buff] = 0 }
     updateWildBuffs()
 
-    if (rng(saved.gamemodDrops == true ? 0.60 : 0.20) && !areas[saved.currentArea]?.trainer && saved.currentArea != areas.frontierSpiralingTower.id && saved.currentArea != areas.training.id) dropItem()
+    let probDrop = saved.gamemodDrops == true ? 0.60 : 0.20;
+    if (typeof Progreso !== 'undefined') probDrop *= Progreso.mult('dropPct');
+    if (typeof Combate2 !== 'undefined') probDrop *= Combate2.multSinergia('dropPct') * Combate2.multBendicion('dropPct');
+    if (typeof Coleccion !== 'undefined') probDrop *= Coleccion.multConjunto('dropPct');
+    if (rng(probDrop) && !areas[saved.currentArea]?.trainer && saved.currentArea != areas.frontierSpiralingTower.id && saved.currentArea != areas.training.id) dropItem()
     //document.getElementById(`pkmn-movebox-wild-${exploreCombatWildTurn}-bar`).style.transition = "0s linear"
     //document.getElementById(`pkmn-movebox-wild-${exploreCombatWildTurn}-bar`).style.width = "0%";
 
@@ -1559,12 +1577,21 @@ for (let i = activeBars; i < hpBars.length; i++) {
 
     
 
+    if (typeof Extras !== 'undefined') Extras.contar('combatesGanados');
+    if (typeof Progreso !== 'undefined' && Extras.stats().combatesGanados % 3 === 0) {
+        Progreso.revisarLogros(); Progreso.revisarMisiones(); Progreso.revisarHitos();
+        if (typeof Coleccion !== 'undefined') { Coleccion.revisarCintas(); Coleccion.revisarLecciones(); }
+        if (typeof Combate2 !== 'undefined') { Combate2.aplicarClimaDeZona(); Combate2.actualizarEficacia(); }
+    }
+
     let baseExpGain = 34/2
     if (areas[saved.currentArea]?.trainer || saved.currentArea == areas.frontierSpiralingTower.id || saved.currentArea == areas.training.id) baseExpGain = 0
 
     // Modificador "Experiencia x3": se aplica a la base, así que escala igual
     // para el miembro activo y para el resto del equipo (que recibe la mitad).
     if (saved.gamemodExp == true) baseExpGain *= 3
+    if (typeof Progreso !== 'undefined') baseExpGain *= Progreso.mult('expPct')
+    if (typeof Combate2 !== 'undefined') baseExpGain *= Combate2.multSinergia('expPct') * Combate2.multBendicion('expPct')
 
     let expGained = 0
     if ( wildLevel > (pkmn[ team[exploreActiveMember].pkmn.id ].level-10) ) { expGained = baseExpGain ;}
@@ -1851,6 +1878,7 @@ for (const i in team) {
         
         pkmn[ team[i].pkmn.id ].exp -= 100
         pkmn[ team[i].pkmn.id ].level++
+        if (typeof Extras !== 'undefined') { Extras.contar('nivelesSubidos'); Extras.sonar('nivel'); }
         document.getElementById(`explore-${i}-lvl`).innerHTML = `lvl ${pkmn[ team[i].pkmn.id ].level}`
         updateTeamExp()
 
@@ -2217,8 +2245,18 @@ function gameLoop(now) {
 
         pasoVisible = (stepsExecuted >= pasosPrevistos - 1);
 
-        exploreCombatPlayer();
-        exploreCombatWild();
+        // Un fallo dentro de un paso no puede romper la cadena de
+        // requestAnimationFrame: si lo hiciera, la partida se quedaría
+        // congelada para siempre y solo se arreglaría recargando.
+        try {
+            exploreCombatPlayer();
+            exploreCombatWild();
+        } catch (err) {
+            if (!gameLoop.avisado) {
+                gameLoop.avisado = true;
+                console.error('Error en el bucle de combate (el juego continúa):', err);
+            }
+        }
 
 
         // Execute once per second (every 60 steps = 1000ms)
@@ -2294,6 +2332,22 @@ let embargoSlot = 1;
 let zCrystalTurn = 0
 
 let lastCrossStab = undefined
+
+// Cadena de cruce: tipos distintos encadenados sin repetir. Cuanto más larga,
+// mayor el multiplicador. Convierte "alterna dos tipos" en "diseña la secuencia".
+let cadenaCruce = []
+const BONUS_CADENA = { 2: 0, 3: 0.1, 4: 0.2 }   // se suma a crossPowerBonus
+
+function longitudCadena() { return cadenaCruce.length }
+
+function registrarCruce(tipo) {
+    if (!tipo) return
+    if (cadenaCruce.includes(tipo)) cadenaCruce = [tipo]   // repetir rompe la cadena
+    else cadenaCruce.push(tipo)
+    if (cadenaCruce.length > 4) cadenaCruce = cadenaCruce.slice(-4)
+}
+
+function romperCadena() { cadenaCruce = [] }
 const crossPattern = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='white' fill-opacity='1'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
 
 
@@ -2323,6 +2377,7 @@ function exploreCombatPlayer() {
     if (!nextMovePlayer) {
         team[exploreActiveMember].turn++;
         lastCrossStab = undefined
+        romperCadena()
         return;
     }
 
@@ -2366,6 +2421,10 @@ function exploreCombatPlayer() {
     if (team[exploreActiveMember].item == item.powerHerb.id && move[nextMovePlayer].power == 0) moveTimerPlayer /= item.powerHerb.power()
 
     if (areas[saved.currentArea].fieldEffect?.includes(field.averageTime.id)) {moveTimerPlayer = defaultPlayerMoveTimer}
+
+    if (typeof Progreso !== 'undefined') moveTimerPlayer /= Progreso.mult('velocidadPct')
+    if (typeof Combate2 !== 'undefined') moveTimerPlayer /= Combate2.multBendicion('velocidadPct')
+    if (typeof Coleccion !== 'undefined') moveTimerPlayer /= Coleccion.multConjunto('velocidadPct')
 
 
     //buff modifiers
@@ -2693,6 +2752,12 @@ function exploreCombatPlayer() {
 
 
         let crossPowerBonus = 1.3
+        if (typeof Progreso !== 'undefined') crossPowerBonus += Progreso.bonus('crucePlano')
+        crossPowerBonus += (BONUS_CADENA[longitudCadena()] || 0)
+        if (typeof Combate2 !== 'undefined') {
+            crossPowerBonus *= Combate2.multSinergia('crucePct')
+            crossPowerBonus += Combate2.bonusBendicion('crucePlano')
+        }
         
         if ( testAbility(`active`, ability.ambidextrous.id)) crossPowerBonus+= 0.3
         if ( testAbility(`active`, ability.treasureOfRuin.id)) crossPowerBonus+= 0.5
@@ -2708,7 +2773,11 @@ function exploreCombatPlayer() {
             if (saved.weatherTimer>0 && saved.weather=="crossRoom") totalPower *= 1.3
         }
         
-        if (nextMove.power>0) lastCrossStab = nextMove.type
+        if (nextMove.power>0) {
+            if (lastCrossStab !== undefined && lastCrossStab !== nextMove.type) registrarCruce(nextMove.type)
+            else if (lastCrossStab === nextMove.type) romperCadena()
+            lastCrossStab = nextMove.type
+        }
 
         if (mimicHasBeenUsed==true) totalPower *= 2
 
@@ -2758,6 +2827,19 @@ function exploreCombatPlayer() {
 
         //held items w specific damage bonus
         if (item[team[exploreActiveMember].item]?.heldBonusPkmn && item[team[exploreActiveMember].item].heldBonusPkmn() == team[exploreActiveMember].pkmn.id) totalPower *= item[team[exploreActiveMember].item].heldBonusPower()
+
+        // Bonus permanentes de logros y del árbol de talentos
+        if (typeof Progreso !== 'undefined') totalPower *= Progreso.mult('danoPct')
+        if (typeof Combate2 !== 'undefined') {
+            totalPower *= Combate2.multSinergia('danoPct')
+            totalPower *= Combate2.multBendicion('danoPct')
+            totalPower *= Combate2.comprobarCombo(exploreActiveMember, moveType)
+        }
+        if (typeof Coleccion !== 'undefined') {
+            totalPower *= Coleccion.multConjunto('danoPct')
+            totalPower *= Coleccion.multMote(team[exploreActiveMember].pkmn.id)
+            totalPower *= Coleccion.multAliado()
+        }
 
         if (nextMove.power === 0) totalPower = 0
 
@@ -3044,6 +3126,14 @@ function exploreCombatPlayer() {
 
 
         wildPkmnHp -= totalPower;
+        if (typeof Extras !== 'undefined') {
+            Extras.contar('danoTotal', totalPower);
+            Extras.contar('movimientosEjecutados');
+            Extras.numeroFlotante(Extras.formatearNumero(totalPower),
+                { color: typeMultiplier > 1 ? '#ff8a5c' : (typeMultiplier < 1 ? '#9ecbff' : '#ffffff'),
+                  grande: typeMultiplier > 1 });
+            Extras.sonar(typeMultiplier > 1 ? 'golpeFuerte' : 'golpe');
+        }
 
 
 
@@ -4040,7 +4130,7 @@ function initialiseArea(){
     document.getElementById("auto-refight-info").innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9"><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></svg>
         
-           <div> ¡Revancha automática activa! <span>(x${item.autoRefightTicket.got} <img src="img/items/autoRefightTicket.png"> Tickets de Revancha restantes)</span> Pulsa para desactivarla</div>
+           <div> ¡Revancha automática activa! <span>(x${item.autoRefightTicket.got} <img alt="" src="img/items/autoRefightTicket.png"> Tickets de Revancha restantes)</span> Pulsa para desactivarla</div>
     `
     }
 
@@ -4049,7 +4139,7 @@ function initialiseArea(){
     document.getElementById("auto-refight-info").innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9"><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></svg>
         
-           <div> ¡Revancha automática activa! <span>(Wont consume an <img src="img/items/autoRefightTicket.png"> Auto-Refight Ticket)</span> Pulsa para desactivarla</div>
+           <div> ¡Revancha automática activa! <span>(Wont consume an <img alt="" src="img/items/autoRefightTicket.png"> Auto-Refight Ticket)</span> Pulsa para desactivarla</div>
     `
     }
 
@@ -4179,7 +4269,7 @@ function setWildAreas() {
         </div>
         <div style="width: 8rem;" class="explore-ticket-right">
         <span class="explore-ticket-bg" style="filter:hue-rotate(-${season[i].hue}deg); background-image: url(img/bg/${season[i].background}.png);"></span>
-        <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;  filter:hue-rotate(-${season[i].hue}deg)" src="img/pkmn/sprite/${season[i].icon.id}.png">
+        <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;  filter:hue-rotate(-${season[i].hue}deg)" src="img/pkmn/sprite/${season[i].icon.id}.png">
         </div>
     `;
 
@@ -4270,7 +4360,7 @@ function setWildAreas() {
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
                     <span class="explore-ticket-bg" style="background-image: url(img/bg/${areas.wildlifePark.background}.png);"></span>
-                    <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas.wildlifePark.icon.id}.png">
+                    <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas.wildlifePark.icon.id}.png">
                 </div>
         `;
     document.getElementById("explore-listing").appendChild(divPark);
@@ -4406,7 +4496,7 @@ function setWildAreas() {
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
                     <span class="explore-ticket-bg" style="background-image: url(img/bg/${areas[i].background}.png);"></span>
-                    <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas[i].icon.id}.png">
+                    <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas[i].icon.id}.png">
                 </div>
         `;
         document.getElementById("explore-listing").appendChild(divAreas);
@@ -4515,7 +4605,7 @@ function setDungeonAreas() {
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
                     <span class="explore-ticket-bg" style="background-image: url(img/bg/${areas[i].background}.png);"></span>
-                    <img class="explore-ticket-sprite" style="z-index: 10; scale: 2; image-rendering:pixelated; filter:drop-shadow(rgba(0,0,0,0.4) 2px 2px)" src="img/items/${areas[i].icon.id}.png">
+                    <img alt="" class="explore-ticket-sprite" style="z-index: 10; scale: 2; image-rendering:pixelated; filter:drop-shadow(rgba(0,0,0,0.4) 2px 2px)" src="img/items/${areas[i].icon.id}.png">
                 </div>
         `;
         document.getElementById("explore-listing").appendChild(divAreas);
@@ -4731,7 +4821,7 @@ function setEventAreas() {
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
                     <span class="explore-ticket-bg" style="background-image: url(img/bg/${areas[i].background}.png);"></span>
-                    <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas[i].icon.id}.png">
+                    <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas[i].icon.id}.png">
                 </div>
 
 
@@ -5385,15 +5475,15 @@ if (document.getElementById("pokedex-search").value!="") {
 
 
 
-        div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
-        if (pkmn[i].shiny) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span> <img class="sprite-trim" src="img/pkmn/shiny/${i}.png">`
-        if (pkmn[i].shiny && pkmn[i].shinyDisabled == true) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
+        div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img alt="" class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
+        if (pkmn[i].shiny) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span> <img alt="" class="sprite-trim" src="img/pkmn/shiny/${i}.png">`
+        if (pkmn[i].shiny && pkmn[i].shinyDisabled == true) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img alt="" class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
 
 
         if (pkmn[i].starsign){
-        div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img style="filter:hue-rotate(${starsign[pkmn[i].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
-        if (pkmn[i].shiny) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span> <img style="filter:hue-rotate(${starsign[pkmn[i].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/shiny/${i}.png">`
-        if (pkmn[i].shiny && pkmn[i].shinyDisabled == true) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img style="filter:hue-rotate(${starsign[pkmn[i].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
+        div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img alt="" style="filter:hue-rotate(${starsign[pkmn[i].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
+        if (pkmn[i].shiny) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span> <img alt="" style="filter:hue-rotate(${starsign[pkmn[i].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/shiny/${i}.png">`
+        if (pkmn[i].shiny && pkmn[i].shinyDisabled == true) div.innerHTML = `<span style="display:flex; white-space:nowrap">lvl ${pkmn[i].level} ${nameMarks}</span><img alt="" style="filter:hue-rotate(${starsign[pkmn[i].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${i}.png">`
         }
 
         
@@ -6556,10 +6646,7 @@ function switchMenu(id){
     } 
 
 
-    /*
-
-    //document.getElementById(`custom-challenges-menu`).style.zIndex = "30"
-
+    document.getElementById(`custom-challenges-menu`).style.zIndex = "30"
 
     if (id==="custom-challenges") {
         if (saved.currentArea!==undefined) {openMenu(); return; }
@@ -6568,10 +6655,7 @@ function switchMenu(id){
         if (typeof updateCustomChallenges === "function") updateCustomChallenges()
     }
 
-    if (id!=="custom-challenges") document.getElementById(`custom-challenges-menu`).style.display = "none"    
-
-
-    */
+    if (id!=="custom-challenges") document.getElementById(`custom-challenges-menu`).style.display = "none"
 
     if (id!=="items") document.getElementById(`item-menu`).style.display = "none"
     if (id!=="dex") document.getElementById(`pokedex-menu`).style.display = "none"
@@ -6633,10 +6717,10 @@ function updateItemBag(){
 
 
         div.dataset.item = i
-        if (item[i].type == "tm") div.innerHTML = `<img src="img/items/tm${format(move[item[i].move].type)}.png"> <span class="item-list-name">${format(i)} ${subtitle}<strong style="opacity:0.6; font-weight:200; white-space:nowrap; font-size:0.9rem; margin-left:0.2rem"> (${move[item[i].move].power} BP, ${format(move[item[i].move].split).slice(0, 3)})</strong> </span>  <span>x${item[i].got}</span>`
-        else if (item[i].type == "memory") div.innerHTML = `<img src="img/items/${item[i].image}Memory.png"> <span class="item-list-name">${format(i)} ${subtitle}</span> <span>x${item[i].got}</span>`
-        else if (item[i].type == "decor") div.innerHTML = `<img src="img/decor/${i}.png" style="scale:1; margin:0 -1rem"> <span class="item-list-name">${format(i)} ${subtitle}</span> <span>x${item[i].got}</span>`
-        else div.innerHTML = `<img src="img/items/${i}.png"> <span class="item-list-name">${format(i)} ${subtitle}</span> <span>x${item[i].got}</span>`
+        if (item[i].type == "tm") div.innerHTML = `<img alt="" src="img/items/tm${format(move[item[i].move].type)}.png"> <span class="item-list-name">${format(i)} ${subtitle}<strong style="opacity:0.6; font-weight:200; white-space:nowrap; font-size:0.9rem; margin-left:0.2rem"> (${move[item[i].move].power} BP, ${format(move[item[i].move].split).slice(0, 3)})</strong> </span>  <span>x${item[i].got}</span>`
+        else if (item[i].type == "memory") div.innerHTML = `<img alt="" src="img/items/${item[i].image}Memory.png"> <span class="item-list-name">${format(i)} ${subtitle}</span> <span>x${item[i].got}</span>`
+        else if (item[i].type == "decor") div.innerHTML = `<img alt="" src="img/decor/${i}.png" style="scale:1; margin:0 -1rem"> <span class="item-list-name">${format(i)} ${subtitle}</span> <span>x${item[i].got}</span>`
+        else div.innerHTML = `<img alt="" src="img/items/${i}.png"> <span class="item-list-name">${format(i)} ${subtitle}</span> <span>x${item[i].got}</span>`
 
 
 
@@ -6905,7 +6989,7 @@ function updateVS() {
         divAreas.innerHTML = `
                         <span class="hitbox"></span>
 
-                <img class="vs-card-flair" src="img/icons/pokeball.svg">
+                <img alt="" class="vs-card-flair" src="img/icons/pokeball.svg">
                 <div class="vs-card-bg"></div>
                     <span class="explore-ticket-left" style="z-index: 2;">
                         <span id="trainer-name-${areas[i].name}" style="font-size:1.3rem">${areas[i].name}${nameTag}</span>
@@ -6914,7 +6998,7 @@ function updateVS() {
                 <div>
                 </div>
                 <div class="vs-card-left">
-                    <img id="trainer-image-${areas[i].name}" class="sprite-trim" src="img/trainers/${areas[i].sprite}.png">
+                    <img alt="" id="trainer-image-${areas[i].name}" class="sprite-trim" src="img/trainers/${areas[i].sprite}.png">
                 </div>
         `;
 
@@ -6935,7 +7019,7 @@ function updateVS() {
 
  }
 
- if (document.getElementById(`vs-listing`).innerHTML == "") document.getElementById(`vs-listing`).innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:#ECDEB7; border-radius:0.3rem; height:15rem; width:15rem; text-align:center"><img src="img/pkmn/sprite/pikachuRockstar.png">¡Has derrotado a todos los entrenadores!<br><span style="font-size:0.9rem; opacity:0.7">¿Y si pruebas la Frontera de Combate?</span></div>`
+ if (document.getElementById(`vs-listing`).innerHTML == "") document.getElementById(`vs-listing`).innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:#ECDEB7; border-radius:0.3rem; height:15rem; width:15rem; text-align:center"><img alt="" src="img/pkmn/sprite/pikachuRockstar.png">¡Has derrotado a todos los entrenadores!<br><span style="font-size:0.9rem; opacity:0.7">¿Y si pruebas la Frontera de Combate?</span></div>`
 
 }
 
@@ -7425,7 +7509,7 @@ function updateFrontier() {
         </div>
         <div style="width: 8rem;" class="explore-ticket-right">
         <span class="explore-ticket-bg" style="background-image: url(img/bg/${areas.frontierSpiralingTower.background}.png);"></span>
-        <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${randomDivisionPkmn(divisionText,saved.currentSpiralingType)}.png">
+        <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${randomDivisionPkmn(divisionText,saved.currentSpiralingType)}.png">
         </div>
     `;
     document.getElementById("frontier-listing").appendChild(spiral);
@@ -7460,7 +7544,7 @@ function updateFrontier() {
         </div>
         <div style="width: 8rem;" class="explore-ticket-right">
         <span class="explore-ticket-bg" style=filter:hue-rotate(-200deg); "background-image: url(img/bg/${areas.frontierBattleFactory.background}.png);"></span>
-        <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;  filter:hue-rotate(-200deg)" src="img/pkmn/sprite/${areas.frontierBattleFactory.icon.id}.png">
+        <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;  filter:hue-rotate(-200deg)" src="img/pkmn/sprite/${areas.frontierBattleFactory.icon.id}.png">
         </div>
     `;
     document.getElementById("frontier-listing").appendChild(factory);
@@ -7497,7 +7581,7 @@ function updateFrontier() {
         </div>
         <div style="width: 8rem;" class="explore-ticket-right">
         <span class="explore-ticket-bg" style=" filter:hue-rotate(-100deg); background-image: url(img/bg/gym.png); "></span>
-        <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;  filter:hue-rotate(-100deg)" src="img/pkmn/sprite/pikachu.png">
+        <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;  filter:hue-rotate(-100deg)" src="img/pkmn/sprite/pikachu.png">
         </div>
     `;
 
@@ -7518,7 +7602,7 @@ function updateFrontier() {
 
 
 
- //if (document.getElementById(`vs-listing`).innerHTML == "") document.getElementById(`vs-listing`).innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:#ECDEB7; border-radius:0.3rem; height:15rem; width:15rem; text-align:center"><img src="img/pkmn/sprite/pikachuRockstar.png">¡Has derrotado a todos los entrenadores!<br><span style="font-size:0.9rem; opacity:0.7">¿Y si pruebas la Frontera de Combate?</span></div>`
+ //if (document.getElementById(`vs-listing`).innerHTML == "") document.getElementById(`vs-listing`).innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:#ECDEB7; border-radius:0.3rem; height:15rem; width:15rem; text-align:center"><img alt="" src="img/pkmn/sprite/pikachuRockstar.png">¡Has derrotado a todos los entrenadores!<br><span style="font-size:0.9rem; opacity:0.7">¿Y si pruebas la Frontera de Combate?</span></div>`
 
  
 }
@@ -7548,7 +7632,7 @@ function loop() {
 
     if (saved.curry && saved.curry.time>-1){
         saved.curry.time -= elapsed
-        document.getElementById(`curry-timer`).innerHTML = `<img src="img/items/friedFood.png"> ${returnHMS(saved.curry.time).replace("0h", "")}`
+        document.getElementById(`curry-timer`).innerHTML = `<img alt="" src="img/items/friedFood.png"> ${returnHMS(saved.curry.time).replace("0h", "")}`
 
 
 
@@ -8130,18 +8214,18 @@ function claimExportReward(){
 
         const div = document.createElement("div");
         div.dataset.item = reward
-        div.innerHTML = `<img style="scale:2; image-rendering: pixelated; cursor:help" src="img/items/${reward}.png">`;
+        div.innerHTML = `<img alt="" style="scale:2; image-rendering: pixelated; cursor:help" src="img/items/${reward}.png">`;
         document.getElementById("reward-items-display").appendChild(div);
 
         const divCandy = document.createElement("div");
         divCandy.dataset.item = item.timeCandy.id
-        divCandy.innerHTML = `<img style="scale:2; image-rendering: pixelated; cursor:help" src="img/items/${item.timeCandy.id}.png">`;
+        divCandy.innerHTML = `<img alt="" style="scale:2; image-rendering: pixelated; cursor:help" src="img/items/${item.timeCandy.id}.png">`;
         document.getElementById("reward-items-display").appendChild(divCandy);
 
         if (item.magazineSubscription.got > 0) {
         const divF = document.createElement("div");
         divF.dataset.item = item.fashionCase.id
-        divF.innerHTML = `<img style="scale:2; image-rendering: pixelated; cursor:help" src="img/items/${item.fashionCase.id}.png">`;
+        divF.innerHTML = `<img alt="" style="scale:2; image-rendering: pixelated; cursor:help" src="img/items/${item.fashionCase.id}.png">`;
         document.getElementById("reward-items-display").appendChild(divF);
         }
 
@@ -8218,12 +8302,12 @@ function changePkmnStarsign(){
     const div = document.createElement(`div`)
 
 
-    let pkmnImg = `<img class="sprite-trim" src="img/pkmn/sprite/${id}.png">`
-    if (previewStarsignShiny) pkmnImg = `<img class="sprite-trim" src="img/pkmn/shiny/${id}.png">`
+    let pkmnImg = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${id}.png">`
+    if (previewStarsignShiny) pkmnImg = `<img alt="" class="sprite-trim" src="img/pkmn/shiny/${id}.png">`
 
     if (!pkmn[id].starsignList.includes(i)) {
-    pkmnImg = `<img class="sprite-trim" style="filter:brightness(0)" src="img/pkmn/sprite/${id}.png">`
-    if (previewStarsignShiny) pkmnImg = `<img class="sprite-trim" style="filter:brightness(0)" src="img/pkmn/shiny/${id}.png">`
+    pkmnImg = `<img alt="" class="sprite-trim" style="filter:brightness(0)" src="img/pkmn/sprite/${id}.png">`
+    if (previewStarsignShiny) pkmnImg = `<img alt="" class="sprite-trim" style="filter:brightness(0)" src="img/pkmn/shiny/${id}.png">`
     }
 
 
@@ -8569,8 +8653,8 @@ const samplePkmn = pkmn[saved.geneticSample];
 currentGeneticsCompatibility = 0
 
 if (saved.geneticHost != undefined) {
-document.getElementById("genetics-host-div").innerHTML = `<img class="sprite-trim" style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: -4.5rem;" id="genetics-host" src="img/pkmn/sprite/${hostPkmn.id}.png">
-<img style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 0; transform: translateY(0.5rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">`
+document.getElementById("genetics-host-div").innerHTML = `<img alt="" class="sprite-trim" style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: -4.5rem;" id="genetics-host" src="img/pkmn/sprite/${hostPkmn.id}.png">
+<img alt="" style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 0; transform: translateY(0.5rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">`
 if (pkmn[saved.geneticHost].shiny) {document.getElementById("genetics-host").src = `img/pkmn/shiny/${saved.geneticHost}.png`;}
 } else {
 document.getElementById("genetics-host-div").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 1024 1024"><path fill="currentColor" d="M512 0C229.232 0 0 229.232 0 512c0 282.784 229.232 512 512 512c282.784 0 512-229.216 512-512C1024 229.232 794.784 0 512 0m0 961.008c-247.024 0-448-201.984-448-449.01c0-247.024 200.976-448 448-448s448 200.977 448 448s-200.976 449.01-448 449.01M736 480H544V288c0-17.664-14.336-32-32-32s-32 14.336-32 32v192H288c-17.664 0-32 14.336-32 32s14.336 32 32 32h192v192c0 17.664 14.336 32 32 32s32-14.336 32-32V544h192c17.664 0 32-14.336 32-32s-14.336-32-32-32"/></svg>`
@@ -8578,7 +8662,7 @@ document.getElementById("genetics-host-div").innerHTML = `<svg xmlns="http://www
 
 
 if (saved.geneticSample != undefined) {
-document.getElementById("genetics-sample-div").innerHTML = `<img class="sprite-trim" style="animation: none; z-index: 1;" id="genetics-sample" src="img/pkmn/sprite/${samplePkmn.id}.png">`
+document.getElementById("genetics-sample-div").innerHTML = `<img alt="" class="sprite-trim" style="animation: none; z-index: 1;" id="genetics-sample" src="img/pkmn/sprite/${samplePkmn.id}.png">`
 if (pkmn[saved.geneticSample].shiny) {document.getElementById("genetics-sample").src = `img/pkmn/shiny/${samplePkmn.id}.png`; }
 } else {
 document.getElementById("genetics-sample-div").innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><path fill="currentColor" d="M512 0C229.232 0 0 229.232 0 512c0 282.784 229.232 512 512 512c282.784 0 512-229.216 512-512C1024 229.232 794.784 0 512 0m0 961.008c-247.024 0-448-201.984-448-449.01c0-247.024 200.976-448 448-448s448 200.977 448 448s-200.976 449.01-448 449.01M736 480H544V288c0-17.664-14.336-32-32-32s-32 14.336-32 32v192H288c-17.664 0-32 14.336-32 32s14.336 32 32 32h192v192c0 17.664 14.336 32 32 32s32-14.336 32-32V544h192c17.664 0 32-14.336 32-32s-14.336-32-32-32"/></svg>`
@@ -8875,7 +8959,7 @@ if (mod==="end"){
     document.getElementById("tooltipTitle").innerHTML = `Resumen de la operación`
     document.getElementById("tooltipTop").style.display = "none"    
     document.getElementById("tooltipMid").innerHTML = `<div class="genetics-overview-tags" id="prevent-tooltip-exit">${summaryTags}</div>`
-    document.getElementById("tooltipBottom").innerHTML = `<div style="display:flex;justify-content:center;align-items:center; width:100%; cursor:help"><div class="area-preview" data-pkmn-editor="${saved.geneticHost}"><img   class="sprite-trim" src="img/pkmn/sprite/${saved.geneticHost}.png"> </div></div>`
+    document.getElementById("tooltipBottom").innerHTML = `<div style="display:flex;justify-content:center;align-items:center; width:100%; cursor:help"><div class="area-preview" data-pkmn-editor="${saved.geneticHost}"><img alt=""   class="sprite-trim" src="img/pkmn/sprite/${saved.geneticHost}.png"> </div></div>`
 
 
     saved.geneticHost = undefined
@@ -9244,7 +9328,7 @@ function setTrainingMenu() {
 
 
     if (saved.trainingPokemon != undefined) {
-        document.getElementById("training-sprite-div").innerHTML = `<img class="sprite-trim" style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: 0rem;" id="training-host" src="img/pkmn/sprite/${saved.trainingPokemon}.png">`
+        document.getElementById("training-sprite-div").innerHTML = `<img alt="" class="sprite-trim" style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: 0rem;" id="training-host" src="img/pkmn/sprite/${saved.trainingPokemon}.png">`
         if (pkmn[saved.trainingPokemon].shiny) {document.getElementById("training-host").src = `img/pkmn/shiny/${saved.trainingPokemon}.png`;}
         if (pkmn[saved.trainingPokemon].starsign){
         document.getElementById("training-host").style.filter = `hue-rotate(${starsign[pkmn[saved.trainingPokemon].starsign].hue}deg)`
@@ -9423,7 +9507,7 @@ for (const item of indexedTeam){
     const i = item.index;
     const div = document.createElement("div");
     div.innerHTML = `
-    <img src="img/pkmn/sprite/${team[i].pkmn.id}.png">
+    <img alt="" src="img/pkmn/sprite/${team[i].pkmn.id}.png">
     <span><bar id="battle-summary-bar-${i}" class="battle-summary-bar"><text>1921</text></bar></span>
     `;
     document.getElementById("battle-summary-flex").appendChild(div);
@@ -9791,10 +9875,10 @@ function claimMysteryGift(){
         }
 
     openMenu()
-    document.getElementById("tooltipTop").innerHTML = `<img src="img/pkmn/shiny/${mysteryGift.icon}.png">`
+    document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/pkmn/shiny/${mysteryGift.icon}.png">`
     document.getElementById("tooltipTitle").innerHTML = `Regalo Misterioso`
     document.getElementById("tooltipMid").innerHTML = `${mysteryGift.info}<br>Tienes hasta ${mysteryGift.duration.toLocaleString("en-US", {month: "long",day: "numeric"})} to claim`
-    document.getElementById("tooltipBottom").innerHTML = `<span data-pkmn-editor=${mysteryGift.icon} id="mystery-claim-button"><img src="img/items/gift.png" style="scale:4; image-rendering:pixelated; padding: 3rem 0; cursor:help" 
+    document.getElementById("tooltipBottom").innerHTML = `<span data-pkmn-editor=${mysteryGift.icon} id="mystery-claim-button"><img alt="" src="img/items/gift.png" style="scale:4; image-rendering:pixelated; padding: 3rem 0; cursor:help" 
     style="cursor:pointer; font-size:2rem" id="prevent-tooltip-exit"></span>`
     openTooltip()
 
@@ -9885,7 +9969,7 @@ function pkmnWalk(){
 
 
     div.innerHTML = `
-    <img src="img/pkmn/${shiny}/${pickedPkmn}.png"
+    <img alt="" src="img/pkmn/${shiny}/${pickedPkmn}.png"
     style="
     animation: pkmn-active 0.5s infinite, pkmn-walk ${duration}s 1 linear; scale: -${scale} ${scale};
     "
@@ -9899,7 +9983,7 @@ function pkmnWalk(){
     div.style.zIndex = position-100
 
     div.innerHTML = `
-    <img src="img/pkmn/${shiny}/${pickedPkmn}.png"
+    <img alt="" src="img/pkmn/${shiny}/${pickedPkmn}.png"
     style="
     animation: pkmn-active 0.5s infinite, pkmn-walk ${duration}s 1 linear;
     "
@@ -9964,7 +10048,7 @@ function seasonalSwitch(){
 
 
 
-    //document.getElementById("tooltipTop").innerHTML = `<img src="img/pkmn/shiny/${mysteryGift.icon}.png">`
+    //document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/pkmn/shiny/${mysteryGift.icon}.png">`
     document.getElementById("tooltipTitle").innerHTML = `Elige un evento`
     document.getElementById("tooltipMid").innerHTML = `Elige el evento de temporada que quieres iniciar. Durará los 10 días siguientes y será reemplazado por los que estén en curso. Eso sí, la tienda de temporada de ese evento no se abrirá`
     document.getElementById("tooltipBottom").innerHTML = `<div id="seasonal-pick-listing"></div>`
@@ -9980,7 +10064,7 @@ function seasonalSwitch(){
 
         div.style.filter = `hue-rotate(${season[i].hue}deg)`
         div.innerHTML = `
-        <img style="filter:hue-rotate(-${season[i].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${season[i].icon.id}.png">
+        <img alt="" style="filter:hue-rotate(-${season[i].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${season[i].icon.id}.png">
         <span>${season[i].name}</span>
         `
 
@@ -10122,7 +10206,7 @@ function seasonCheck() {
 
 
     if (saved.currentSeason !== undefined && saved.temporalSeason == undefined) {
-    document.getElementById('shop-categories').innerHTML += `<div onclick="shopCategory = 'limited'; updateItemShop() "><img src="img/items/cherishball.png">Limited</div>`;
+    document.getElementById('shop-categories').innerHTML += `<div onclick="shopCategory = 'limited'; updateItemShop() "><img alt="" src="img/items/cherishball.png">Limited</div>`;
     }
     
 }
@@ -10326,9 +10410,9 @@ function updateMegaDimension(tier){
         div.innerHTML = `
         
             ${dimensionIndicator}
-            <img class="dimension-bhole" style="animation: rotate 20s infinite linear reverse; scale: 1.3;" src="img/icons/bhole.png">
-            <img class="dimension-bhole" src="img/icons/bhole.png">
-            <img class="dimension-sprite sprite-trim" src="img/pkmn/sprite/${areas[i].icon.id}.png">
+            <img alt="" class="dimension-bhole" style="animation: rotate 20s infinite linear reverse; scale: 1.3;" src="img/icons/bhole.png">
+            <img alt="" class="dimension-bhole" src="img/icons/bhole.png">
+            <img alt="" class="dimension-sprite sprite-trim" src="img/pkmn/sprite/${areas[i].icon.id}.png">
             `
 
         document.getElementById("dimension-portal-wrapper").appendChild(div);
@@ -10409,9 +10493,9 @@ function updateMegaDimension(tier){
         </div>
         
             ${dimensionIndicator}
-            <img class="dimension-bhole" style="animation: rotate 20s infinite linear reverse; scale: 1.3;" src="img/icons/bhole.png">
-            <img class="dimension-bhole" src="img/icons/bhole.png">
-            <img class="dimension-sprite sprite-trim" src="img/pkmn/sprite/${areas[i].icon.id}.png">
+            <img alt="" class="dimension-bhole" style="animation: rotate 20s infinite linear reverse; scale: 1.3;" src="img/icons/bhole.png">
+            <img alt="" class="dimension-bhole" src="img/icons/bhole.png">
+            <img alt="" class="dimension-sprite sprite-trim" src="img/pkmn/sprite/${areas[i].icon.id}.png">
             `
 
         document.getElementById("dimension-listing").appendChild(div);
@@ -10466,7 +10550,7 @@ function updateMegaDimension(tier){
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
                     <span class="explore-ticket-bg" style="background-image: url(img/bg/${areas[i].background}.png);"></span>
-                    <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas[i].icon.id}.png">
+                    <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas[i].icon.id}.png">
                 </div>
         `;
 
@@ -10543,7 +10627,10 @@ window.addEventListener('beforeunload', function(event) {
 
 
 
-window.addEventListener('load', function() {
+// Arranque. Antes usaba 'load', que espera a que descarguen los 20 MB de
+// imágenes; 'DOMContentLoaded' solo espera al HTML y los scripts, que es todo
+// lo que este código necesita. El primer arranque pasa a ser inmediato.
+document.addEventListener('DOMContentLoaded', function() {
 
 
     
@@ -10611,6 +10698,42 @@ window.addEventListener('load', function() {
     saved.gamemodFatiga ??= false;
     saved.gamemodDureza ??= false;
     saved.gamemodCruce ??= false;
+
+    // Sistemas añadidos
+    saved.volumen ??= 0;
+    saved.daltonico ??= false;
+    saved.sinAnimaciones ??= false;
+    saved.compacto ??= false;
+    saved.notificaciones ??= false;
+    saved.esencia ??= 0;
+    saved.prestigios ??= 0;
+    saved.talentos ??= {};
+    saved.logros ??= {};
+    saved.hitosDex ??= {};
+    saved.stats ??= {};
+    saved.bendiciones ??= [];
+    saved.equipoPorArea ??= {};
+    saved.historial ??= [];
+    saved.lecciones ??= {};
+    saved.temaPropio ??= {};
+    saved.paseReclamado ??= 0;
+    saved.modoManual ??= false;
+    saved.climaDinamico ??= true;
+    saved.mercadoVariable ??= true;
+
+    if (typeof Coleccion !== 'undefined') {
+        Coleccion.registrarCintasNuevas();
+        Coleccion.aplicarTemaPropio();
+        Coleccion.registrarMuestra();
+        Coleccion.comprobarColisiones();
+    }
+
+    if (typeof aplicarAjustesVisuales === 'function') aplicarAjustesVisuales();
+    if (typeof Progreso !== 'undefined') {
+        Progreso.invalidarCache();
+        Progreso.revisarLogros();
+        Progreso.revisarHitos();
+    }
 
     requestAnimationFrame(loop);
 

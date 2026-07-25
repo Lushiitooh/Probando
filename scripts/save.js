@@ -79,6 +79,7 @@ function saveGame() {
   }
 
   localStorage.setItem("gameData", JSON.stringify(data));
+  if (typeof Extras !== 'undefined') Extras.guardarCopia();
 }
 
 // ---- CARGAR ----

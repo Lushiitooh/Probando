@@ -690,7 +690,7 @@ IVs: 0 HP / 0 Atk / 0 Def / 6 SpA / 6 SpD / 6 Spe
       
       entry.innerHTML = `
         ${itemIcon}
-        <img class="custom-challenge-select-sprite" src="${sprite}">
+        <img alt="" class="custom-challenge-select-sprite" src="${sprite}">
         <div class="custom-challenge-select-info">
           <span class="custom-challenge-select-name">${format(mon.id)}</span>
           <span class="custom-challenge-select-level">Level ${mon.level}</span>
@@ -972,7 +972,7 @@ IVs: 0 HP / 0 Atk / 0 Def / 6 SpA / 6 SpD / 6 Spe
       customTab.style.display = "none";
       mainBtn.style.cssText = activeMainStyle;
       customBtn.style.cssText = inactiveStyle;
-      if (headerTitle) headerTitle.textContent = "Challenges";
+      if (headerTitle) headerTitle.textContent = "Retos";
       if (headerHelp) headerHelp.dataset.help = "Retos principales";
     } else {
       mainTab.style.display = "none";

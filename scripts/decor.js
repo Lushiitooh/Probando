@@ -35,7 +35,7 @@ function openDecor(){
     for (const i of pkmn[currentDecorPokemon].decorOwned){
         const div = document.createElement("div")
         div.innerHTML = `
-        <span><img src="img/decor/${i}.png"> </span> ${format(i)}
+        <span><img alt="" src="img/decor/${i}.png"> </span> ${format(i)}
         `
 
         document.getElementById("decor-list").appendChild(div)

@@ -100,7 +100,7 @@ function updatePreviewTeam(){
     slotNumber++
 
     let itemDiv = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g fill="currentColor"><path d="M224 128a96 96 0 1 1-96-96a96 96 0 0 1 96 96" opacity="0.2"/><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88m48-88a8 8 0 0 1-8 8h-32v32a8 8 0 0 1-16 0v-32H88a8 8 0 0 1 0-16h32V88a8 8 0 0 1 16 0v32h32a8 8 0 0 1 8 8"/></g></svg>`
-    if (currentTeam[i].item !== undefined) itemDiv = `<img src="img/items/${ currentTeam[i].item }.png">`
+    if (currentTeam[i].item !== undefined) itemDiv = `<img alt="" src="img/items/${ currentTeam[i].item }.png">`
 
     let nameTag = ""
     if (areas[saved.currentAreaBuffer]?.type=="frontier" && rotationFrontierCurrent===1 && (returnPkmnDivision(pkmn[currentTeam[i].pkmn])!="C" &&  returnPkmnDivision(pkmn[currentTeam[i].pkmn])!="D")) nameTag += ` ⛔`
@@ -132,9 +132,9 @@ function updatePreviewTeam(){
     let pkmnName = `${format(currentTeam[i].pkmn)} ${nameTag} <span class="explore-pkmn-level" id="explore-${i}-lvl">lvl ${pkmn[ currentTeam[i].pkmn ].level}</span>`
     if (pkmn[currentTeam[i].pkmn].shiny) pkmnName = `${format(currentTeam[i].pkmn)} ${nameTag} <span style="color:#FF4671;">✦</span> <span class="explore-pkmn-level" id="explore-${i}-lvl">lvl ${pkmn[ currentTeam[i].pkmn ].level}</span>`
 
-    let pkmnSprite = `<img class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
-    if (pkmn[currentTeam[i].pkmn].shiny) pkmnSprite = `<img class="sprite-trim" src="img/pkmn/shiny/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
-    if (pkmn[currentTeam[i].pkmn].shiny && pkmn[currentTeam[i].pkmn].shinyDisabled == true) pkmnSprite = `<img class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+    let pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+    if (pkmn[currentTeam[i].pkmn].shiny) pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/shiny/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+    if (pkmn[currentTeam[i].pkmn].shiny && pkmn[currentTeam[i].pkmn].shinyDisabled == true) pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
 
     div.innerHTML = `
         <div class="team-member-slotnumber">#0${slotNumber}</div>
@@ -186,9 +186,13 @@ function updatePreviewTeam(){
     divMove.innerHTML = 
         `<div id = "pkmn-movebox-${e}-team-${i}-bar-preview"
         class="pkmn-movebox-progress" style="background: ${returnTypeColor(move[ moveId ].type)} "></div><span>`
-        + format(moveId) + signatureIcon + `</span><img style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">
+        + format(moveId) + signatureIcon + `</span><img alt="" style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">
     `
     divMove.dataset.move = moveId
+                if (typeof ES !== 'undefined' && ES.tipo) {
+                    divMove.dataset.tipo = move[moveId].type
+                    divMove.dataset.tipoCorto = (ES.tipo[move[moveId].type] || move[moveId].type).slice(0, 3).toUpperCase()
+                }
     document.getElementById(`explore-team-member-${i}-moves-preview`).appendChild(divMove)
     }
 
@@ -517,6 +521,9 @@ function setPkmnTeamHp(){
     // Modificador "Equipo resistente": se aplica después de fijar el multiplicador
     // base para que valga igual en zonas salvajes, entrenadores y entrenamiento.
     if (saved.gamemodDureza == true) hpMultiplier *= 2
+    if (typeof Progreso !== 'undefined') hpMultiplier *= Progreso.mult('psPct')
+    if (typeof Combate2 !== 'undefined') hpMultiplier *= Combate2.multSinergia('psPct') * Combate2.multBendicion('psPct')
+    if (typeof Coleccion !== 'undefined') hpMultiplier *= Coleccion.multConjunto('psPct')
 
 
     
@@ -721,20 +728,20 @@ function setPkmnTeam(){
     if (pkmn[team[i].pkmn.id].shiny) pkmnName = `${nickname} <span style="color:#FF4671;">✦</span> <span class="explore-pkmn-level" id="explore-${i}-lvl">lvl ${pkmn[team[i].pkmn.id].level}</span>`
 
 
-    let pkmnSprite = `<img class="sprite-trim" src="img/pkmn/sprite/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
-    if (pkmn[team[i].pkmn.id].shiny) pkmnSprite = `<img class="sprite-trim" src="img/pkmn/shiny/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
-    if (pkmn[team[i].pkmn.id].shiny && pkmn[team[i].pkmn.id].shinyDisabled == true) pkmnSprite = `<img class="sprite-trim" src="img/pkmn/sprite/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
+    let pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
+    if (pkmn[team[i].pkmn.id].shiny) pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/shiny/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
+    if (pkmn[team[i].pkmn.id].shiny && pkmn[team[i].pkmn.id].shinyDisabled == true) pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
 
     if (pkmn[team[i].pkmn.id].starsign){
-    pkmnSprite = `<img  style="filter:hue-rotate(${starsign[pkmn[team[i].pkmn.id].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
-    if (pkmn[team[i].pkmn.id].shiny) pkmnSprite = `<img style="filter:hue-rotate(${starsign[pkmn[team[i].pkmn.id].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/shiny/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
-    if (pkmn[team[i].pkmn.id].shiny && pkmn[team[i].pkmn.id].shinyDisabled == true) pkmnSprite = `<img style="filter:hue-rotate(${starsign[pkmn[team[i].pkmn.id].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
+    pkmnSprite = `<img alt=""  style="filter:hue-rotate(${starsign[pkmn[team[i].pkmn.id].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
+    if (pkmn[team[i].pkmn.id].shiny) pkmnSprite = `<img alt="" style="filter:hue-rotate(${starsign[pkmn[team[i].pkmn.id].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/shiny/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
+    if (pkmn[team[i].pkmn.id].shiny && pkmn[team[i].pkmn.id].shinyDisabled == true) pkmnSprite = `<img alt="" style="filter:hue-rotate(${starsign[pkmn[team[i].pkmn.id].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${team[i].pkmn.id}.png" id="explore-team-member-${i}-sprite">`
     }
 
     let decorSprite = ""
     if (pkmn[team[i].pkmn.id].decor) {
         const decorData = pkmn[team[i].pkmn.id].decor
-        decorSprite = `<img class="sprite-decor" src="img/decor/${decorData.decor}.png" 
+        decorSprite = `<img alt="" class="sprite-decor" src="img/decor/${decorData.decor}.png" 
                     style="position: absolute; left: ${decorData.x}px; top: ${decorData.y}px; pointer-events: none;">`
     }
 
@@ -749,7 +756,7 @@ function setPkmnTeam(){
 
             <div class="explore-header-infobox">
 
-                <img class="explore-team-member-flair" src="img/icons/pokeball.svg">
+                <img alt="" class="explore-team-member-flair" src="img/icons/pokeball.svg">
                 <div class="explore-header-hpbox">
                 <span style="color: white;">${pkmnName}</span>
                 <div class="explore-hp" id="explore-${i}-hp"></div>
@@ -809,9 +816,13 @@ function setPkmnTeam(){
     id = "pkmn-movebox-${e}-team-${i}-bar"
     class="pkmn-movebox-progress" style="background: ${returnTypeColor(move[ moveId ].type)} "></div><span>`
     + format(moveId) + signatureIcon +
-     `</span><img style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">`
+     `</span><img alt="" style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">`
 
      divMove.dataset.move = moveId
+                if (typeof ES !== 'undefined' && ES.tipo) {
+                    divMove.dataset.tipo = move[moveId].type
+                    divMove.dataset.tipoCorto = (ES.tipo[move[moveId].type] || move[moveId].type).slice(0, 3).toUpperCase()
+                }
     document.getElementById(`explore-team-member-${i}-moves`).appendChild(divMove)
     }
 
@@ -916,7 +927,7 @@ function updatePreviewTeam(){
             slotNumber++
 
             let itemDiv = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g fill="currentColor"><path d="M224 128a96 96 0 1 1-96-96a96 96 0 0 1 96 96" opacity="0.2"/><path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88m48-88a8 8 0 0 1-8 8h-32v32a8 8 0 0 1-16 0v-32H88a8 8 0 0 1 0-16h32V88a8 8 0 0 1 16 0v32h32a8 8 0 0 1 8 8"/></g></svg>`
-            if (currentTeam[i].item !== undefined) itemDiv = `<img src="img/items/${ currentTeam[i].item }.png">`
+            if (currentTeam[i].item !== undefined) itemDiv = `<img alt="" src="img/items/${ currentTeam[i].item }.png">`
 
             let nameTag = ""
             if (areas[saved.currentAreaBuffer]?.type=="frontier" && rotationFrontierCurrent===1 && (returnPkmnDivision(pkmn[currentTeam[i].pkmn])!="C" &&  returnPkmnDivision(pkmn[currentTeam[i].pkmn])!="D")) nameTag += ` ⛔`
@@ -947,14 +958,14 @@ function updatePreviewTeam(){
             if (pkmn[currentTeam[i].pkmn].shiny) pkmnName = `${nickname} ${nameTag} <span style="color:#FF4671;">✦</span> <span class="explore-pkmn-level" id="explore-${i}-lvl">lvl ${pkmn[ currentTeam[i].pkmn ].level}</span>`
 
 
-            let pkmnSprite = `<img class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
-            if (pkmn[currentTeam[i].pkmn].shiny) pkmnSprite = `<img class="sprite-trim" src="img/pkmn/shiny/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
-            if (pkmn[currentTeam[i].pkmn].shiny && pkmn[currentTeam[i].pkmn].shinyDisabled == true) pkmnSprite = `<img class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+            let pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+            if (pkmn[currentTeam[i].pkmn].shiny) pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/shiny/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+            if (pkmn[currentTeam[i].pkmn].shiny && pkmn[currentTeam[i].pkmn].shinyDisabled == true) pkmnSprite = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
 
             if (pkmn[currentTeam[i].pkmn].starsign){
-            pkmnSprite = `<img  style="filter:hue-rotate(${starsign[pkmn[currentTeam[i].pkmn].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
-            if (pkmn[currentTeam[i].pkmn].shiny) pkmnSprite = `<img style="filter:hue-rotate(${starsign[pkmn[currentTeam[i].pkmn].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/shiny/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
-            if (pkmn[currentTeam[i].pkmn].shiny && pkmn[currentTeam[i].pkmn].shinyDisabled == true) pkmnSprite = `<img style="filter:hue-rotate(${starsign[pkmn[currentTeam[i].pkmn].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+            pkmnSprite = `<img alt=""  style="filter:hue-rotate(${starsign[pkmn[currentTeam[i].pkmn].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+            if (pkmn[currentTeam[i].pkmn].shiny) pkmnSprite = `<img alt="" style="filter:hue-rotate(${starsign[pkmn[currentTeam[i].pkmn].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/shiny/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
+            if (pkmn[currentTeam[i].pkmn].shiny && pkmn[currentTeam[i].pkmn].shinyDisabled == true) pkmnSprite = `<img alt="" style="filter:hue-rotate(${starsign[pkmn[currentTeam[i].pkmn].starsign].hue}deg)" class="sprite-trim" src="img/pkmn/sprite/${currentTeam[i].pkmn}.png" id="explore-team-member-${i}-sprite">`
             }
 
 
@@ -963,7 +974,7 @@ function updatePreviewTeam(){
             let decorSprite = ""
             if (pkmn[currentTeam[i].pkmn].decor) {
                 const decorData = pkmn[currentTeam[i].pkmn].decor
-                decorSprite = `<img class="sprite-decor" src="img/decor/${decorData.decor}.png" 
+                decorSprite = `<img alt="" class="sprite-decor" src="img/decor/${decorData.decor}.png" 
                             style="position: absolute; left: ${decorData.x}px; top: ${decorData.y}px; pointer-events: none;">`
             }
 
@@ -1042,9 +1053,13 @@ function updatePreviewTeam(){
                 divMove.innerHTML = 
                     `<div id = "pkmn-movebox-${e}-team-${i}-bar-preview"
                     class="pkmn-movebox-progress" style="background: ${returnTypeColor(move[ moveId ].type)} "></div><span>`
-                    + format(moveId) + signatureIcon + `</span><img style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">
+                    + format(moveId) + signatureIcon + `</span><img alt="" style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">
                 `
                 divMove.dataset.move = moveId
+                if (typeof ES !== 'undefined' && ES.tipo) {
+                    divMove.dataset.tipo = move[moveId].type
+                    divMove.dataset.tipoCorto = (ES.tipo[move[moveId].type] || move[moveId].type).slice(0, 3).toUpperCase()
+                }
                 document.getElementById(`explore-team-member-${i}-moves-preview`).appendChild(divMove)
             }
         }

@@ -264,6 +264,41 @@ document.getElementById("settings-battle-speed").addEventListener("change", e =>
   saved.velocidadCombate = Number(document.getElementById(`settings-battle-speed`).value)
 });
 
+
+//--Ajustes añadidos: audio y accesibilidad.
+//  `aplicarAjustesVisuales()` traduce el estado guardado a clases del <body>,
+//  para que el CSS haga el resto sin lógica repartida.
+saved.volumen = 0
+saved.daltonico = false
+saved.sinAnimaciones = false
+saved.compacto = false
+
+function aplicarAjustesVisuales() {
+  document.body.classList.toggle("daltonico", saved.daltonico === true)
+  document.body.classList.toggle("compacto",  saved.compacto === true)
+  document.body.classList.toggle("sin-animaciones", saved.sinAnimaciones === true)
+}
+
+document.getElementById("settings-volumen").addEventListener("change", e => {
+  saved.volumen = Number(e.target.value)
+  if (typeof Extras !== "undefined") Extras.sonar("boton")
+});
+
+document.getElementById("settings-daltonico").addEventListener("change", e => {
+  saved.daltonico = e.target.value === "true"
+  aplicarAjustesVisuales()
+});
+
+document.getElementById("settings-animaciones").addEventListener("change", e => {
+  saved.sinAnimaciones = e.target.value === "true"
+  aplicarAjustesVisuales()
+});
+
+document.getElementById("settings-compacto").addEventListener("change", e => {
+  saved.compacto = e.target.value === "true"
+  aplicarAjustesVisuales()
+});
+
 function changeTheme(){
 
   let theme = saved.theme
@@ -947,6 +982,10 @@ function updateSettings(alt){
 
   document.getElementById("settings-theme").value = saved.theme
   document.getElementById("settings-battle-speed").value = velocidadCombate()
+  document.getElementById("settings-volumen").value     = saved.volumen ?? 0
+  document.getElementById("settings-daltonico").value   = saved.daltonico ? "true" : "false"
+  document.getElementById("settings-animaciones").value = saved.sinAnimaciones ? "true" : "false"
+  document.getElementById("settings-compacto").value    = saved.compacto ? "true" : "false"
 
   if (saved.hideGotPkmn == "true") {document.getElementById("settings-hide-got").value = "true"} else document.getElementById("settings-hide-got").value = "false"
   if (saved.alternateWildRotation == "true") {document.getElementById("settings-alternate-rotation").value = "true"} else document.getElementById("settings-alternate-rotation").value = "false"

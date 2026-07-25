@@ -1767,7 +1767,7 @@ areas.eventMegaBlastoise = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.pokeflute.got--},
-    unlockDescription : `Necesitas una <img src="img/items/pokeflute.png"> Poké Flauta para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/pokeflute.png"> Poké Flauta para entrar`,
     unlockRequirement : function() { return item.pokeflute.got>0 },
     level : 100,
     team : {
@@ -1788,7 +1788,7 @@ areas.eventMegaCharizardY = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.pokeflute.got--},
-    unlockDescription : `Necesitas una <img src="img/items/pokeflute.png"> Poké Flauta para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/pokeflute.png"> Poké Flauta para entrar`,
     unlockRequirement : function() { return item.pokeflute.got>0 },
     level : 100,
     team : {
@@ -1809,7 +1809,7 @@ areas.eventMegaVenusaur = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.pokeflute.got--},
-    unlockDescription : `Necesitas una <img src="img/items/pokeflute.png"> Poké Flauta para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/pokeflute.png"> Poké Flauta para entrar`,
     unlockRequirement : function() { return item.pokeflute.got>0 },
     level : 100,
     team : {
@@ -1873,7 +1873,7 @@ areas.eventZapdos = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.epochFeather.got--},
-    unlockDescription : `Necesitas una <img src="img/items/epochFeather.png"> Pluma del Tiempo para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/epochFeather.png"> Pluma del Tiempo para entrar`,
     unlockRequirement : function() { return item.epochFeather.got>0 },
     level : 90,
     team : {
@@ -1894,7 +1894,7 @@ areas.eventArticuno = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.epochFeather.got--},
-    unlockDescription : `Necesitas una <img src="img/items/epochFeather.png"> Pluma del Tiempo para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/epochFeather.png"> Pluma del Tiempo para entrar`,
     unlockRequirement : function() { return item.epochFeather.got>0 },
     level : 90,
     team : {
@@ -1915,7 +1915,7 @@ areas.eventMoltres = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.epochFeather.got--},
-    unlockDescription : `Necesitas una <img src="img/items/epochFeather.png"> Pluma del Tiempo para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/epochFeather.png"> Pluma del Tiempo para entrar`,
     unlockRequirement : function() { return item.epochFeather.got>0 },
     level : 90,
     team : {
@@ -1936,7 +1936,7 @@ areas.eventMegaCamerupt = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.epochFeather.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/epochFeather.png"> Plumas del Tiempo para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/epochFeather.png"> Plumas del Tiempo para entrar`,
     unlockRequirement : function() { return item.epochFeather.got>2 },
     level : 100,
     team : {
@@ -1957,7 +1957,7 @@ areas.eventMegaManectric = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.epochFeather.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/epochFeather.png"> Plumas del Tiempo para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/epochFeather.png"> Plumas del Tiempo para entrar`,
     unlockRequirement : function() { return item.epochFeather.got>2 },
     level : 100,
     team : {
@@ -1978,7 +1978,7 @@ areas.eventMegaAbomasnow = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.epochFeather.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/epochFeather.png"> Plumas del Tiempo para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/epochFeather.png"> Plumas del Tiempo para entrar`,
     unlockRequirement : function() { return item.epochFeather.got>2 },
     level : 100,
     team : {
@@ -2001,7 +2001,7 @@ areas.eventMegaRaichuX = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.pokeflute.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/pokeflute.png"> Poké Flautas para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/pokeflute.png"> Poké Flautas para entrar`,
     unlockRequirement : function() { return item.pokeflute.got>2 },
     level : 110,
     team : {
@@ -2022,7 +2022,7 @@ areas.eventMegaRaichuY = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.pokeflute.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/pokeflute.png"> Poké Flautas para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/pokeflute.png"> Poké Flautas para entrar`,
     unlockRequirement : function() { return item.pokeflute.got>2 },
     level : 110,
     team : {
@@ -2043,7 +2043,7 @@ areas.eventMegaCharizardX = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.pokeflute.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/pokeflute.png"> Poké Flautas para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/pokeflute.png"> Poké Flautas para entrar`,
     unlockRequirement : function() { return item.pokeflute.got>2 },
     level : 110,
     team : {
@@ -2106,7 +2106,7 @@ areas.eventGreatTusk = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientOrchid.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>0 },
     level : 90,
     team : {
@@ -2127,7 +2127,7 @@ areas.eventScreamTail = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientOrchid.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>0 },
     level : 90,
     team : {
@@ -2149,7 +2149,7 @@ areas.eventSlitherWing = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientOrchid.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>0 },
     level : 90,
     team : {
@@ -2172,7 +2172,7 @@ areas.eventBruteBonnet = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientOrchid.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>0 },
     level : 90,
     team : {
@@ -2193,7 +2193,7 @@ areas.eventFlutterMane = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientOrchid.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>0 },
     level : 90,
     team : {
@@ -2214,7 +2214,7 @@ areas.eventSandyShocks = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientOrchid.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientOrchid.png"> Orquídea Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>0 },
     level : 90,
     team : {
@@ -2236,7 +2236,7 @@ areas.eventRoaringMoon = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.ancientOrchid.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/ancientOrchid.png"> Orquídeas Ancestrales para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/ancientOrchid.png"> Orquídeas Ancestrales para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>2 },
     level : 100,
     team : {
@@ -2258,7 +2258,7 @@ areas.eventMegaAerodactly = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.ancientOrchid.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/ancientOrchid.png"> Orquídeas Ancestrales para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/ancientOrchid.png"> Orquídeas Ancestrales para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>2 },
     level : 100,
     team : {
@@ -2279,7 +2279,7 @@ areas.eventMegaGyarados = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.ancientOrchid.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/ancientOrchid.png"> Orquídeas Ancestrales para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/ancientOrchid.png"> Orquídeas Ancestrales para entrar`,
     unlockRequirement : function() { return item.ancientOrchid.got>2 },
     level : 100,
     team : {
@@ -2343,7 +2343,7 @@ areas.eventMegaGarchomp = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.primalEarth.got--},
-    unlockDescription : `Necesitas una <img src="img/items/primalEarth.png"> Tierra Primigenia para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/primalEarth.png"> Tierra Primigenia para entrar`,
     unlockRequirement : function() { return item.primalEarth.got>0 },
     level : 100,
     team : {
@@ -2364,7 +2364,7 @@ areas.eventMegaTyranitar = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.primalEarth.got--},
-    unlockDescription : `Necesitas una <img src="img/items/primalEarth.png"> Tierra Primigenia para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/primalEarth.png"> Tierra Primigenia para entrar`,
     unlockRequirement : function() { return item.primalEarth.got>0 },
     level : 100,
     team : {
@@ -2385,7 +2385,7 @@ areas.eventTapuBulu = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.primalEarth.got--},
-    unlockDescription : `Necesitas una <img src="img/items/primalEarth.png"> Tierra Primigenia para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/primalEarth.png"> Tierra Primigenia para entrar`,
     unlockRequirement : function() { return item.primalEarth.got>0 },
     level : 100,
     team : {
@@ -2408,7 +2408,7 @@ areas.eventMegaPinsir = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.primalEarth.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/primalEarth.png"> Tierras Primigenias para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/primalEarth.png"> Tierras Primigenias para entrar`,
     unlockRequirement : function() { return item.primalEarth.got>2 },
     level : 110,
     team : {
@@ -2429,7 +2429,7 @@ areas.eventGalarianZapdos = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.primalEarth.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/primalEarth.png"> Tierras Primigenias para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/primalEarth.png"> Tierras Primigenias para entrar`,
     unlockRequirement : function() { return item.primalEarth.got>2 },
     level : 110,
     team : {
@@ -2450,7 +2450,7 @@ areas.eventTingLu = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.primalEarth.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/primalEarth.png"> Tierras Primigenias para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/primalEarth.png"> Tierras Primigenias para entrar`,
     unlockRequirement : function() { return item.primalEarth.got>2 },
     level : 110,
     team : {
@@ -2553,7 +2553,7 @@ areas.eventMegaSceptile = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.steelKeystone.got--},
-    unlockDescription : `Necesitas una <img src="img/items/steelKeystone.png"> Piedra Clave de Acero para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/steelKeystone.png"> Piedra Clave de Acero para entrar`,
     unlockRequirement : function() { return item.steelKeystone.got>0 },
     level : 100,
     team : {
@@ -2574,7 +2574,7 @@ areas.eventMegaSwampert = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.steelKeystone.got--},
-    unlockDescription : `Necesitas una <img src="img/items/steelKeystone.png"> Piedra Clave de Acero para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/steelKeystone.png"> Piedra Clave de Acero para entrar`,
     unlockRequirement : function() { return item.steelKeystone.got>0 },
     level : 100,
     team : {
@@ -2595,7 +2595,7 @@ areas.eventMegaBlaziken = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.steelKeystone.got--},
-    unlockDescription : `Necesitas una <img src="img/items/steelKeystone.png"> Piedra Clave de Acero para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/steelKeystone.png"> Piedra Clave de Acero para entrar`,
     unlockRequirement : function() { return item.steelKeystone.got>0 },
     level : 100,
     team : {
@@ -2640,7 +2640,7 @@ areas.eventRegirock = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientKeystone.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientKeystone.png"> Piedra Clave Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientKeystone.png"> Piedra Clave Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientKeystone.got>0 },
     level : 90,
     team : {
@@ -2661,7 +2661,7 @@ areas.eventRegisteel = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientKeystone.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientKeystone.png"> Piedra Clave Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientKeystone.png"> Piedra Clave Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientKeystone.got>0 },
     level : 90,
     team : {
@@ -2682,7 +2682,7 @@ areas.eventRegice = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.ancientKeystone.got--},
-    unlockDescription : `Necesitas una <img src="img/items/ancientKeystone.png"> Piedra Clave Ancestral para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/ancientKeystone.png"> Piedra Clave Ancestral para entrar`,
     unlockRequirement : function() { return item.ancientKeystone.got>0 },
     level : 90,
     team : {
@@ -2703,7 +2703,7 @@ areas.eventMegaMawile = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.ancientKeystone.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/ancientKeystone.png"> Piedras Clave Ancestrales para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/ancientKeystone.png"> Piedras Clave Ancestrales para entrar`,
     unlockRequirement : function() { return item.ancientKeystone.got>2 },
     level : 100,
     team : {
@@ -2724,7 +2724,7 @@ areas.eventMegaGlalie = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.ancientKeystone.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/ancientKeystone.png"> Piedras Clave Ancestrales para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/ancientKeystone.png"> Piedras Clave Ancestrales para entrar`,
     unlockRequirement : function() { return item.ancientKeystone.got>2 },
     level : 100,
     team : {
@@ -2745,7 +2745,7 @@ areas.eventMegaSteelix = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.ancientKeystone.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/ancientKeystone.png"> Piedras Clave Ancestrales para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/ancientKeystone.png"> Piedras Clave Ancestrales para entrar`,
     unlockRequirement : function() { return item.ancientKeystone.got>2 },
     level : 100,
     team : {
@@ -2768,7 +2768,7 @@ areas.eventRegieleki = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.steelKeystone.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/steelKeystone.png"> Piedras Clave de Acero para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/steelKeystone.png"> Piedras Clave de Acero para entrar`,
     unlockRequirement : function() { return item.steelKeystone.got>2 },
     level : 110,
     team : {
@@ -2789,7 +2789,7 @@ areas.eventRegidrago = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.steelKeystone.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/steelKeystone.png"> Piedras Clave de Acero para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/steelKeystone.png"> Piedras Clave de Acero para entrar`,
     unlockRequirement : function() { return item.steelKeystone.got>2 },
     level : 110,
     team : {
@@ -2810,7 +2810,7 @@ areas.eventGougingFire = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.steelKeystone.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/steelKeystone.png"> Piedras Clave de Acero para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/steelKeystone.png"> Piedras Clave de Acero para entrar`,
     unlockRequirement : function() { return item.steelKeystone.got>2 },
     level : 110,
     team : {
@@ -2896,7 +2896,7 @@ areas.eventNaganadel = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.aetherKeycard.got--},
-    unlockDescription : `Necesitas una <img src="img/items/aetherKeycard.png"> Tarjeta Aether para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/aetherKeycard.png"> Tarjeta Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>0 },
     level : 90,
     team : {
@@ -2917,7 +2917,7 @@ areas.eventSilvally = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.aetherKeycard.got--},
-    unlockDescription : `Necesitas una <img src="img/items/aetherKeycard.png"> Tarjeta Aether para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/aetherKeycard.png"> Tarjeta Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>0 },
     level : 90,
     team : {
@@ -2938,7 +2938,7 @@ areas.eventCosmoem = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.aetherKeycard.got--},
-    unlockDescription : `Necesitas una <img src="img/items/aetherKeycard.png"> Tarjeta Aether para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/aetherKeycard.png"> Tarjeta Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>0 },
     level : 90,
     team : {
@@ -2959,7 +2959,7 @@ areas.eventGuzzlord = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.aetherKeycard.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>2 },
     level : 100,
     team : {
@@ -2980,7 +2980,7 @@ areas.eventXurkitree = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.aetherKeycard.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>2 },
     level : 100,
     team : {
@@ -3001,7 +3001,7 @@ areas.eventNihilego = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.aetherKeycard.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>2 },
     level : 100,
     team : {
@@ -3022,7 +3022,7 @@ areas.eventKartana = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.aetherKeycard.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>2 },
     level : 100,
     team : {
@@ -3043,7 +3043,7 @@ areas.eventBuzzwole = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.aetherKeycard.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>2 },
     level : 100,
     team : {
@@ -3065,7 +3065,7 @@ areas.eventPheromosa = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.aetherKeycard.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>2 },
     level : 100,
     team : {
@@ -3086,7 +3086,7 @@ areas.eventBlacephalon = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.aetherKeycard.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/aetherKeycard.png"> Tarjetas Aether para entrar`,
     unlockRequirement : function() { return item.aetherKeycard.got>2 },
     level : 100,
     team : {
@@ -3131,7 +3131,7 @@ areas.eventMegaMetagross = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.wormholeResidue.got--},
-    unlockDescription : `Necesitas un <img src="img/items/wormholeResidue.png"> Residuo de Ultraumbral para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/wormholeResidue.png"> Residuo de Ultraumbral para entrar`,
     unlockRequirement : function() { return item.wormholeResidue.got>0 },
     level : 100,
     team : {
@@ -3153,7 +3153,7 @@ areas.eventTapuFini = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.wormholeResidue.got--},
-    unlockDescription : `Necesitas un <img src="img/items/wormholeResidue.png"> Residuo de Ultraumbral para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/wormholeResidue.png"> Residuo de Ultraumbral para entrar`,
     unlockRequirement : function() { return item.wormholeResidue.got>0 },
     level : 100,
     team : {
@@ -3174,7 +3174,7 @@ areas.eventTapuLele = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.wormholeResidue.got--},
-    unlockDescription : `Necesitas un <img src="img/items/wormholeResidue.png"> Residuo de Ultraumbral para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/wormholeResidue.png"> Residuo de Ultraumbral para entrar`,
     unlockRequirement : function() { return item.wormholeResidue.got>0 },
     level : 100,
     team : {
@@ -3199,7 +3199,7 @@ areas.eventChienPao = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.wormholeResidue.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/wormholeResidue.png"> Residuos de Ultraumbral para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/wormholeResidue.png"> Residuos de Ultraumbral para entrar`,
     unlockRequirement : function() { return item.wormholeResidue.got>2 },
     level : 110,
     team : {
@@ -3220,7 +3220,7 @@ areas.eventMegaDragonite = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.wormholeResidue.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/wormholeResidue.png"> Residuos de Ultraumbral para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/wormholeResidue.png"> Residuos de Ultraumbral para entrar`,
     unlockRequirement : function() { return item.wormholeResidue.got>2 },
     level : 110,
     team : {
@@ -3241,7 +3241,7 @@ areas.eventGalarianMoltres = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.wormholeResidue.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/wormholeResidue.png"> Residuos de Ultraumbral para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/wormholeResidue.png"> Residuos de Ultraumbral para entrar`,
     unlockRequirement : function() { return item.wormholeResidue.got>2 },
     level : 110,
     team : {
@@ -3353,7 +3353,7 @@ areas.eventMegaGengar = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.futureContraption.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureContraption.png"> Artilugio del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureContraption.png"> Artilugio del Futuro para entrar`,
     unlockRequirement : function() { return item.futureContraption.got>0 },
     level : 100,
     team : {
@@ -3376,7 +3376,7 @@ areas.eventThundurusTherian = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.futureContraption.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureContraption.png"> Artilugio del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureContraption.png"> Artilugio del Futuro para entrar`,
     unlockRequirement : function() { return item.futureContraption.got>0 },
     level : 100,
     team : {
@@ -3397,7 +3397,7 @@ areas.eventTapuKoko = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.futureContraption.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureContraption.png"> Artilugio del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureContraption.png"> Artilugio del Futuro para entrar`,
     unlockRequirement : function() { return item.futureContraption.got>0 },
     level : 100,
     team : {
@@ -3422,7 +3422,7 @@ areas.eventIronThorns = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.futureDisk.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>0 },
     level : 90,
     team : {
@@ -3443,7 +3443,7 @@ areas.eventIronHands = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.futureDisk.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>0 },
     level : 90,
     team : {
@@ -3464,7 +3464,7 @@ areas.eventIronJugulis = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.futureDisk.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>0 },
     level : 90,
     team : {
@@ -3489,7 +3489,7 @@ areas.eventIronTreads = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.futureDisk.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>0 },
     level : 90,
     team : {
@@ -3511,7 +3511,7 @@ areas.eventIronBundle = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.futureDisk.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>0 },
     level : 90,
     team : {
@@ -3532,7 +3532,7 @@ areas.eventIronMoth = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.futureDisk.got--},
-    unlockDescription : `Necesitas un <img src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/futureDisk.png"> Disco del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>0 },
     level : 90,
     team : {
@@ -3554,7 +3554,7 @@ areas.eventIronValiant = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.futureDisk.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/futureDisk.png"> Discos del Futuro para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/futureDisk.png"> Discos del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>2 },
     level : 100,
     team : {
@@ -3577,7 +3577,7 @@ areas.eventMegaScizor = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.futureDisk.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/futureDisk.png"> Discos del Futuro para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/futureDisk.png"> Discos del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>2 },
     level : 100,
     team : {
@@ -3599,7 +3599,7 @@ areas.eventMegaAggron = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.futureDisk.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/futureDisk.png"> Discos del Futuro para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/futureDisk.png"> Discos del Futuro para entrar`,
     unlockRequirement : function() { return item.futureDisk.got>2 },
     level : 100,
     team : {
@@ -3626,7 +3626,7 @@ areas.eventMegaBaxcalibur = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.futureContraption.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/futureContraption.png"> Artilugios del Futuro para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/futureContraption.png"> Artilugios del Futuro para entrar`,
     unlockRequirement : function() { return item.futureContraption.got>2 },
     level : 110,
     team : {
@@ -3648,7 +3648,7 @@ areas.eventChiYu = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.futureContraption.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/futureContraption.png"> Artilugios del Futuro para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/futureContraption.png"> Artilugios del Futuro para entrar`,
     unlockRequirement : function() { return item.futureContraption.got>2 },
     level : 110,
     team : {
@@ -3669,7 +3669,7 @@ areas.eventGalarianArticuno = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.futureContraption.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/futureContraption.png"> Artilugios del Futuro para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/futureContraption.png"> Artilugios del Futuro para entrar`,
     unlockRequirement : function() { return item.futureContraption.got>2 },
     level : 110,
     team : {
@@ -3777,7 +3777,7 @@ areas.eventMegaGallade = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.redChain.got--},
-    unlockDescription : `Necesitas una <img src="img/items/redChain.png"> Cadena Roja para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/redChain.png"> Cadena Roja para entrar`,
     unlockRequirement : function() { return item.redChain.got>0 },
     level : 100,
     team : {
@@ -3798,7 +3798,7 @@ areas.eventCresselia = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.redChain.got--},
-    unlockDescription : `Necesitas una <img src="img/items/redChain.png"> Cadena Roja para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/redChain.png"> Cadena Roja para entrar`,
     unlockRequirement : function() { return item.redChain.got>0 },
     level : 100,
     team : {
@@ -3819,7 +3819,7 @@ areas.eventHeatran = {
     encounter: true,
     difficulty: tier3difficulty,
     encounterEffect : function() {item.redChain.got--},
-    unlockDescription : `Necesitas una <img src="img/items/redChain.png"> Cadena Roja para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/redChain.png"> Cadena Roja para entrar`,
     unlockRequirement : function() { return item.redChain.got>0 },
     level : 100,
     team : {
@@ -3842,7 +3842,7 @@ areas.eventMegaLucario = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.redChain.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/redChain.png"> Cadenas Rojas para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/redChain.png"> Cadenas Rojas para entrar`,
     unlockRequirement : function() { return item.redChain.got>2 },
     level : 110,
     team : {
@@ -3863,7 +3863,7 @@ areas.eventMegaHeracross = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.redChain.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/redChain.png"> Cadenas Rojas para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/redChain.png"> Cadenas Rojas para entrar`,
     unlockRequirement : function() { return item.redChain.got>2 },
     level : 110,
     team : {
@@ -3884,7 +3884,7 @@ areas.eventWoChien = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.redChain.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/redChain.png"> Cadenas Rojas para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/redChain.png"> Cadenas Rojas para entrar`,
     unlockRequirement : function() { return item.redChain.got>2 },
     level : 110,
     team : {
@@ -3933,7 +3933,7 @@ areas.eventMesprit = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.wisdomPetal.got--},
-    unlockDescription : `Necesitas un <img src="img/items/wisdomPetal.png"> Pétalo de Sabiduría para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/wisdomPetal.png"> Pétalo de Sabiduría para entrar`,
     unlockRequirement : function() { return item.wisdomPetal.got>0 },
     level : 90,
     team : {
@@ -3954,7 +3954,7 @@ areas.eventAzelf = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.wisdomPetal.got--},
-    unlockDescription : `Necesitas un <img src="img/items/wisdomPetal.png"> Pétalo de Sabiduría para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/wisdomPetal.png"> Pétalo de Sabiduría para entrar`,
     unlockRequirement : function() { return item.wisdomPetal.got>0 },
     level : 90,
     team : {
@@ -3976,7 +3976,7 @@ areas.eventUxie = {
     encounter: true,
     difficulty: tier1difficulty,
     encounterEffect : function() {item.wisdomPetal.got--},
-    unlockDescription : `Necesitas un <img src="img/items/wisdomPetal.png"> Pétalo de Sabiduría para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/wisdomPetal.png"> Pétalo de Sabiduría para entrar`,
     unlockRequirement : function() { return item.wisdomPetal.got>0 },
     level : 90,
     team : {
@@ -3998,7 +3998,7 @@ areas.eventMegaPidgeot = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.wisdomPetal.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/wisdomPetal.png"> Pétalos de Sabiduría para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/wisdomPetal.png"> Pétalos de Sabiduría para entrar`,
     unlockRequirement : function() { return item.wisdomPetal.got>2 },
     level : 100,
     team : {
@@ -4019,7 +4019,7 @@ areas.eventMegaBeedrill = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.wisdomPetal.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/wisdomPetal.png"> Pétalos de Sabiduría para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/wisdomPetal.png"> Pétalos de Sabiduría para entrar`,
     unlockRequirement : function() { return item.wisdomPetal.got>2 },
     level : 100,
     team : {
@@ -4040,7 +4040,7 @@ areas.eventMegaAlakazam = {
     encounter: true,
     difficulty: tier2difficulty,
     encounterEffect : function() {item.wisdomPetal.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/wisdomPetal.png"> Pétalos de Sabiduría para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/wisdomPetal.png"> Pétalos de Sabiduría para entrar`,
     unlockRequirement : function() { return item.wisdomPetal.got>2 },
     level : 100,
     team : {
@@ -5876,7 +5876,7 @@ areas.dimensionRaid1 = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.megaShard.got-=1},
-    unlockDescription : `Necesitas un <img src="img/items/megaShard.png"> Fragmento Mega para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/megaShard.png"> Fragmento Mega para entrar`,
     unlockRequirement : function() { return item.megaShard.got>0 },
     level : 100,
     team : {
@@ -5919,7 +5919,7 @@ areas.dimensionRaid2 = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.megaPiece.got-=1},
-    unlockDescription : `Necesitas una <img src="img/items/megaPiece.png"> Pieza Mega para entrar`,
+    unlockDescription : `Necesitas una <img alt="" src="img/items/megaPiece.png"> Pieza Mega para entrar`,
     unlockRequirement : function() { return item.megaPiece.got>0 },
     level : 100,
     team : {
@@ -5958,7 +5958,7 @@ areas.dimensionRaid3 = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.megaChunk.got-=1},
-    unlockDescription : `Necesitas un <img src="img/items/megaChunk.png"> Trozo Mega para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/megaChunk.png"> Trozo Mega para entrar`,
     unlockRequirement : function() { return item.megaChunk.got>0 },
     level : 100,
     team : {
@@ -5997,7 +5997,7 @@ areas.dimensionRaid4 = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.megaCluster.got-=1},
-    unlockDescription : `Necesitas un <img src="img/items/megaCluster.png"> Cúmulo Mega para entrar`,
+    unlockDescription : `Necesitas un <img alt="" src="img/items/megaCluster.png"> Cúmulo Mega para entrar`,
     unlockRequirement : function() { return item.megaCluster.got>0 },
     level : 100,
     team : {
@@ -6375,7 +6375,7 @@ areas.seasonMarshadow = {
     encounter: true,
     difficulty: tier4difficulty,
     encounterEffect : function() {item.oldGateau.got-=3},
-    unlockDescription : `Necesitas x3 <img src="img/items/oldGateau.png"> Tartas Antiguas para entrar`,
+    unlockDescription : `Necesitas x3 <img alt="" src="img/items/oldGateau.png"> Tartas Antiguas para entrar`,
     unlockRequirement : function() { return item.oldGateau.got>2 },
     level : 90,
     team : {

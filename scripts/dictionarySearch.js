@@ -144,7 +144,7 @@ function updateDictionary(){
 
         const div = document.createElement("div")
 
-        let icon = `<span><img src="img/icons/${move[ i ].type }.svg"></span>`
+        let icon = `<span><img alt="" src="img/icons/${move[ i ].type }.svg"></span>`
 
         div.dataset.dictionaryMove = i
 

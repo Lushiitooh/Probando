@@ -5847,51 +5847,7 @@ transform: translateY(-1rem);
     cursor: pointer;
 }
 
-.update-banner {
-    animation: updateBanner 10s;
-    animation-fill-mode : forwards;
-    transition: 0.1s;
-}
 
-.update-banner:hover{
-    top: 0 !important;
-}
-
-
-@keyframes updateBanner {
-    0%{top:-2rem}
-    5%{top: 0%;}
-    95%{top: 0;}
-    100%{top: -33px}
-}
-
-
-.update-banner::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0) 100%,
-    transparent 100%
-  );
-  animation: updateFlash 2s infinite;
-}
-
-@keyframes updateFlash {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
 
 
 
@@ -6865,3 +6821,326 @@ transform: translateY(-1rem);
     height: 100%;
     width: 100%;
 }
+
+/* =========================================================================
+   Sistemas añadidos: avisos, números flotantes, logros, prestigio, misiones
+   ========================================================================= */
+
+/* --- números de daño flotantes --- */
+.numero-flotante {
+    position: fixed;
+    z-index: 400;
+    pointer-events: none;
+    font-family: inherit;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 4px #000, 0 2px 3px #000;
+    animation: flotarNumero 0.9s ease-out forwards;
+    transform: translateX(-50%);
+}
+
+@keyframes flotarNumero {
+    0%   { opacity: 0; transform: translate(-50%, 0) scale(0.7); }
+    15%  { opacity: 1; transform: translate(-50%, -10px) scale(1.1); }
+    100% { opacity: 0; transform: translate(-50%, -70px) scale(1); }
+}
+
+/* --- avisos apilados --- */
+#pila-avisos {
+    position: fixed;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-width: min(22rem, 80vw);
+    pointer-events: none;
+}
+
+.aviso-extra {
+    background: rgba(20, 20, 20, 0.94);
+    color: #fff;
+    border-left: 4px solid #82df60;
+    border-radius: 0.3rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 1rem;
+    line-height: 1.35;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    transition: opacity 0.4s;
+    animation: entrarAviso 0.3s ease-out;
+}
+
+.aviso-extra span { opacity: 0.85; font-size: 0.9rem; }
+
+@keyframes entrarAviso {
+    from { opacity: 0; transform: translateX(40px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* --- barra de deshacer --- */
+.barra-deshacer {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    background: rgba(20, 20, 20, 0.95);
+    color: #fff;
+    border-radius: 0.4rem;
+    padding: 0.6rem 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+}
+
+.barra-deshacer button {
+    background: #82df60;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.35rem 0.8rem;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* --- tablas y listas de los paneles --- */
+.tabla-extra { display: flex; flex-direction: column; gap: 0.15rem; text-align: left; }
+
+.tabla-extra > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.25rem;
+}
+
+.resumen-extra {
+    padding: 0.6rem;
+    margin-bottom: 0.6rem;
+    background: rgba(130, 223, 96, 0.15);
+    border-radius: 0.3rem;
+    font-size: 1rem;
+}
+
+.lista-logros, .lista-misiones, .lista-copias {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    text-align: left;
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.logro {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.3rem;
+    opacity: 0.55;
+}
+
+.logro.hecho { opacity: 1; background: rgba(130, 223, 96, 0.14); }
+.logro-icono { font-size: 1.4rem; flex-shrink: 0; }
+.logro-texto { flex: 1; }
+.logro-texto small { opacity: 0.75; }
+.logro-bonus { font-size: 0.85rem; opacity: 0.8; text-align: right; flex-shrink: 0; }
+
+/* --- prestigio --- */
+.bloque-renacer {
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.35rem;
+    margin-bottom: 0.8rem;
+    text-align: center;
+}
+
+.bloque-renacer p { margin: 0.4rem 0; }
+
+.boton-renacer, .boton-cancelar {
+    border: none;
+    border-radius: 0.3rem;
+    padding: 0.5rem 1.2rem;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.boton-renacer  { background: #b58bd8; color: #fff; }
+.boton-cancelar { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+.rama-talentos { margin-bottom: 0.9rem; text-align: left; }
+.rama-talentos h4 {
+    margin: 0 0 0.3rem;
+    padding: 0.3rem 0.6rem;
+    background: rgba(181, 139, 216, 0.25);
+    border-radius: 0.25rem;
+}
+
+.talento {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 0.45rem 0.6rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.3rem;
+    margin-bottom: 0.2rem;
+}
+
+.talento-info small { opacity: 0.75; }
+
+.talento-boton {
+    background: #b58bd8;
+    color: #fff;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.35rem 0.7rem;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.talento-boton.sin-esencia { opacity: 0.4; cursor: not-allowed; }
+.talento-max { opacity: 0.6; font-weight: bold; flex-shrink: 0; }
+
+/* --- misiones --- */
+.mision {
+    padding: 0.5rem 0.6rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.3rem;
+}
+
+.mision.hecha { background: rgba(130, 223, 96, 0.16); }
+
+.barra-mision {
+    height: 0.5rem;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 0.25rem;
+    overflow: hidden;
+    margin: 0.35rem 0 0.2rem;
+}
+
+.barra-mision > div { height: 100%; background: #82df60; transition: width 0.3s; }
+
+/* --- copias de seguridad --- */
+.copia {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 0.5rem 0.6rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.3rem;
+}
+
+.copia button {
+    background: #82df60;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.35rem 0.8rem;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* --- accesibilidad: respetar la preferencia de menos movimiento --- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* --- modo daltónicos: el tipo deja de depender solo del color --- */
+body.daltonico [data-tipo]::after {
+    content: attr(data-tipo-corto);
+    margin-left: 0.3rem;
+    font-size: 0.75em;
+    opacity: 0.9;
+    font-weight: bold;
+}
+
+/* --- modo compacto --- */
+body.compacto { font-size: 0.85rem; }
+body.compacto .explore-sprite { transform: scale(0.85); }
+
+/* --- rotación, eficacia, galería, comparador --- */
+.lista-rotacion { display: flex; flex-direction: column; gap: 0.25rem; text-align: left; margin-bottom: 0.6rem; }
+
+.lista-rotacion > div {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+    padding: 0.45rem 0.6rem; border-radius: 0.3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid transparent;
+}
+
+.rot-cruza   { border-left-color: #82df60; background: rgba(130, 223, 96, 0.14) !important; }
+.rot-nocruza { border-left-color: #d88; }
+.rot-nodano  { opacity: 0.55; }
+.rot-nombre  { flex: 1; font-weight: bold; }
+.rot-tipo    { opacity: 0.75; font-size: 0.9rem; }
+.rot-marca   { font-weight: bold; white-space: nowrap; }
+
+.marca-eficacia {
+    position: absolute; top: 2px; right: 4px;
+    font-size: 0.72rem; font-weight: bold;
+    padding: 0 0.25rem; border-radius: 0.2rem;
+    background: rgba(0, 0, 0, 0.55); color: #fff;
+    pointer-events: none; z-index: 5;
+}
+.ef-super { background: #c1440e; }
+.ef-bien  { background: #2f7d32; }
+.ef-poco  { background: #2b5d8a; }
+.ef-nulo  { background: #444; }
+
+.galeria { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.galeria-pieza {
+    width: 4.2rem; text-align: center;
+    background: rgba(255, 255, 255, 0.05); border-radius: 0.3rem; padding: 0.25rem;
+}
+.galeria-pieza img { width: 100%; image-rendering: pixelated; }
+.galeria-pieza small { display: block; font-size: 0.65rem; opacity: 0.85; word-break: break-word; }
+
+.campo-busqueda {
+    width: 100%; box-sizing: border-box; margin-bottom: 0.6rem;
+    padding: 0.5rem 0.7rem; border-radius: 0.3rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.3); color: inherit;
+    font-family: inherit; font-size: 1rem; resize: vertical;
+}
+
+.comparador-cabecera {
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    margin-bottom: 0.6rem;
+}
+.comparador-cabecera select {
+    flex: 1; padding: 0.4rem; border-radius: 0.3rem;
+    background: rgba(0, 0, 0, 0.3); color: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.25); font-family: inherit;
+}
+.tabla-extra .gana { color: #82df60; }
+
+.grafica-extra { margin-bottom: 1rem; text-align: left; }
+.grafica-extra svg {
+    width: 100%; height: auto; display: block;
+    background: rgba(0, 0, 0, 0.25); border-radius: 0.3rem; margin: 0.3rem 0;
+}
+.grafica-extra small { opacity: 0.7; }
+
+.leccion { text-align: left; line-height: 1.5; padding: 0.4rem; }
+
+/* la caja de movimiento necesita ser contenedor para la marca de eficacia */
+.pkmn-movebox { position: relative; }

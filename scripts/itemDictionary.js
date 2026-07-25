@@ -712,7 +712,7 @@ item.fashionCase = {
         document.getElementById("tooltipTitle").style.display = `none`
         document.getElementById("tooltipBottom").style.display = `none`
         document.getElementById("tooltipMid").style.display = "inline"
-        document.getElementById("tooltipTop").innerHTML = `<img src="img/decor/${pickedDecor}.png" style="scale:2">`
+        document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/decor/${pickedDecor}.png" style="scale:2">`
         document.getElementById("tooltipMid").innerHTML = `
         <div class="genetics-overview-tags" >
         <div style="filter:hue-rotate(100deg)" >${format(pickedDecor)} Decor got!</div>

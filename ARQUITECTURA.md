@@ -691,7 +691,34 @@ botón, así que hubo que traducir las dos caras a la vez.
 
 ---
 
-## 14. Recetas para añadir contenido
+## 14. Módulos añadidos
+
+Todo lo nuevo vive en archivos aparte, y los originales solo reciben llamadas
+puntuales del tipo `if (typeof X !== 'undefined') ...`. Si un módulo no se carga,
+el juego sigue funcionando exactamente igual que antes.
+
+| Archivo | Contiene |
+|---|---|
+| [extras.js](scripts/extras.js) | estadísticas, copias de seguridad rotativas, audio sintetizado, números flotantes, avisos, deshacer |
+| [progreso.js](scripts/progreso.js) | 44 logros, prestigio, 9 talentos, misiones diarias, rangos, hitos |
+| [combate2.js](scripts/combate2.js) | sinergias, combos, bendiciones, variantes de IA, análisis de rotación, simulador, clima por zona |
+| [coleccion.js](scripts/coleccion.js) | galería, Pokédex viviente, reciclaje, conjuntos, mercado, pase, ranuras, mazmorras, aliados, gráficas |
+| [paneles.js](scripts/paneles.js) · [paneles2.js](scripts/paneles2.js) | interfaz de todo lo anterior, dentro del tooltip que el juego ya usaba |
+| [sw.js](sw.js) · [manifest.webmanifest](manifest.webmanifest) | PWA: instalable y jugable sin conexión |
+| [tests/formulas.test.js](tests/formulas.test.js) | 28 tests de las fórmulas y de integridad de datos |
+
+**Dos decisiones que conviene conocer:**
+
+El **audio se sintetiza con Web Audio**, no hay archivos. Cero descargas y cero
+problemas de licencia, a cambio de sonidos sencillos.
+
+El **service worker sirve el código por red primero** y las imágenes por caché
+primero. Es deliberado: así una actualización se ve al recargar, en vez de quedarse
+pegada una versión vieja.
+
+---
+
+## 15. Recetas para añadir contenido
 
 **Un Pokémon nuevo** — añadir a `pkmnDictionary.js` con `bst` en escala *real* (el bucle del
 final lo convierte a estrellas), y poner sprites en `img/pkmn/sprite/`, `img/pkmn/mini/` y
@@ -711,7 +738,7 @@ aprenderlo), `split`, `rarity`, `type`, `power`. Para efectos, usar `hitEffect(t
 
 ---
 
-## 15. Trampas conocidas
+## 16. Trampas conocidas
 
 1. **Funciones duplicadas.** La segunda definición gana y la primera es código muerto:
    - `learnPkmnMove` — [script.js:452](scripts/script.js:452) vs [script.js:516](scripts/script.js:516)
@@ -726,19 +753,18 @@ aprenderlo), `split`, `rarity`, `type`, `power`. Para efectos, usar `hitEffect(t
    `document.getElementById('pkmn-movebox-wild-1').dataset.move`. La lógica de combate
    depende de que la UI esté renderizada.
 
-5. **`Challenges` está apagado pero completo.** 1.131 líneas en `scripts/PR/` con su
-   `<div id="custom-challenges-menu">` todavía en [index.html:1085](index.html:1085); los
-   `<script>`, el item de menú y el bloque de `switchMenu` están comentados en los tres
-   sitios. Es una feature entera esperando a que alguien la encienda.
+5. **`Challenges` ya está activo.** Estaba apagado en **cuatro** sitios, no en tres: los
+   `<script>`, el item de menú, el bloque de `switchMenu` y también el propio
+   `<div id="custom-challenges-menu">`, que en el análisis inicial di por vivo por error.
 
-6. **`updateCheck.js`** hace polling a la API de GitHub cada 5 minutos para avisar de
-   versiones nuevas. Es la única petición de red del juego.
+6. **`updateCheck.js` se eliminó.** Hacía polling a la API de GitHub del repositorio
+   original cada 5 minutos. Con él fuera, el juego ya no hace ninguna petición de red.
 
 7. **Sin licencia propia** y los sprites son propiedad de Nintendo/Game Freak.
 
 ---
 
-## 16. Mapa de archivos
+## 17. Mapa de archivos
 
 | Archivo | Líneas | Responsabilidad |
 |---|---:|---|

@@ -1699,8 +1699,8 @@ function updateItemShop(){
     assignShopApricorn()
     assignShopDecor()
 
-    document.getElementById("shop-currency").innerHTML = `<img src="img/items/bottleCap.png"> x${item.bottleCap.got}`
-    document.getElementById("shop-currency-gold").innerHTML = `<img src="img/items/goldenBottleCap.png"> x${item.goldenBottleCap.got}`
+    document.getElementById("shop-currency").innerHTML = `<img alt="" src="img/items/bottleCap.png"> x${item.bottleCap.got}`
+    document.getElementById("shop-currency-gold").innerHTML = `<img alt="" src="img/items/goldenBottleCap.png"> x${item.goldenBottleCap.got}`
 
 
     if (shopCategory == undefined){
@@ -1761,10 +1761,10 @@ function updateItemShop(){
     const apricornCounter = document.createElement("div")
     apricornCounter.className = "shop-apricorn-counter"
     apricornCounter.innerHTML =`
-    <div><img src="img/items/yellowApricorn.png">${item.yellowApricorn.got}</div>
-    <div><img src="img/items/pinkApricorn.png">${item.pinkApricorn.got}</div>
-    <div><img src="img/items/greenApricorn.png">${item.greenApricorn.got}</div>
-    <div><img src="img/items/whiteApricorn.png">${item.whiteApricorn.got}</div>
+    <div><img alt="" src="img/items/yellowApricorn.png">${item.yellowApricorn.got}</div>
+    <div><img alt="" src="img/items/pinkApricorn.png">${item.pinkApricorn.got}</div>
+    <div><img alt="" src="img/items/greenApricorn.png">${item.greenApricorn.got}</div>
+    <div><img alt="" src="img/items/whiteApricorn.png">${item.whiteApricorn.got}</div>
     `
     document.getElementById("shop-listing").appendChild(apricornCounter);
 
@@ -1823,31 +1823,31 @@ function updateItemShop(){
     const shopItem = shop[i].icon
 
     if (item[shopItem] && item[shopItem].type=="tm"){ div.innerHTML = `
-    <img src="img/items/tm${format(move[item[shopItem].move].type)}.png">
+    <img alt="" src="img/items/tm${format(move[item[shopItem].move].type)}.png">
         <span>${name}${stockTag}</span>
     <strong id="shop-currency-${i}">
-        <img src="img/items/${currency}.png">
+        <img alt="" src="img/items/${currency}.png">
         x${shop[i].price}
     </strong>
     `;} else if (item[shopItem] && item[shopItem].type=="memory"){ div.innerHTML = `
-    <img src="img/items/${item[shopItem].image}Memory.png">
+    <img alt="" src="img/items/${item[shopItem].image}Memory.png">
         <span>${name}${stockTag}</span>
     <strong id="shop-currency-${i}">
-        <img src="img/items/${currency}.png">
+        <img alt="" src="img/items/${currency}.png">
         x${shop[i].price}
     </strong>
     `;} else if (item[shopItem] && item[shopItem].type=="decor"){ div.innerHTML = `
-    <img src="img/decor/${shop[i].icon}.png" style="scale:1; margin: 0 -2rem;">
+    <img alt="" src="img/decor/${shop[i].icon}.png" style="scale:1; margin: 0 -2rem;">
         <span style="padding-left:0.5rem">${name}${stockTag}</span>
     <strong id="shop-currency-${i}">
-        <img src="img/items/${currency}.png">
+        <img alt="" src="img/items/${currency}.png">
         x${shop[i].price}
     </strong>
     `;} else {div.innerHTML = `
-    <img src="img/items/${shop[i].icon}.png">
+    <img alt="" src="img/items/${shop[i].icon}.png">
         <span>${name}${stockTag}</span>
     <strong id="shop-currency-${i}">
-        <img src="img/items/${currency}.png">
+        <img alt="" src="img/items/${currency}.png">
         x${shop[i].price}
     </strong>
     `}
@@ -1879,10 +1879,10 @@ function updateItemShop(){
 
 
     div.innerHTML = `
-        <img src="img/items/pokeball.png">
+        <img alt="" src="img/items/pokeball.png">
         <span>${name}</span>
     <strong  id="shop-currency-${i}">
-        <img src="img/items/${currency}.png">
+        <img alt="" src="img/items/${currency}.png">
         x${shop[i].price}
     </strong>
     `
@@ -2024,10 +2024,10 @@ function updateIngredientShop(){
     div.dataset.ability = ingredient[i].ability
 
     div.innerHTML = `
-        <img src="img/items/${i}.png">
+        <img alt="" src="img/items/${i}.png">
             <span>${format(i)} (${format(ingredient[i].ability)})</span>
         <strong id="shop-currency-${i}">
-            <img src="img/items/goldenBottleCap.png">
+            <img alt="" src="img/items/goldenBottleCap.png">
             x${ingredient[i].price}
         </strong>
     `
@@ -2084,7 +2084,7 @@ function updateCurry(){
         totalPrice += ingredient[i].price
     }
     
-    document.getElementById(`curry-pay`).innerHTML = `Pagar y cocinar (${totalPrice} <img src="img/items/goldenBottleCap.png">)`
+    document.getElementById(`curry-pay`).innerHTML = `Pagar y cocinar (${totalPrice} <img alt="" src="img/items/goldenBottleCap.png">)`
 
     document.getElementById(`curry-effects`).innerHTML = `
     <svg data-help="curry" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M10 8.484C10.5 7.494 11 7 12 7c1.246 0 2 .989 2 1.978s-.5 1.483-2 2.473V13m0 3.5v.5"/></g></svg>
@@ -2179,7 +2179,7 @@ function makeCurry(){
         document.getElementById("tooltipBottom").innerHTML = joinWithAnd(curryAbilities)
         openTooltip()
         item.goldenBottleCap.got -= totalPrice
-            document.getElementById("shop-currency-gold").innerHTML = `<img src="img/items/goldenBottleCap.png"> x${item.goldenBottleCap.got}`
+            document.getElementById("shop-currency-gold").innerHTML = `<img alt="" src="img/items/goldenBottleCap.png"> x${item.goldenBottleCap.got}`
         saved.lastCurryRotation = rotationWildCurrent
         curryIngredientList = []
         updateCurry()

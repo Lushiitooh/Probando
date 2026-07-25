@@ -112,8 +112,8 @@ function tooltipData(category, ttdata){
         if (pkmn[item.id].caught>0 || areas[ttdata].type == "dungeon" || areas[ttdata].uncatchable) div.dataset.pkmn = item.id
 
 
-        div.innerHTML = `<img class="sprite-trim" src="img/pkmn/sprite/${item.id}.png">` + tag;
-        if (pkmn[item.id].shiny && areas[ttdata].uncatchable!=true && areas[ttdata].type != "dungeon") div.innerHTML = `<img class="sprite-trim" src="img/pkmn/shiny/${item.id}.png">` + tag;
+        div.innerHTML = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${item.id}.png">` + tag;
+        if (pkmn[item.id].shiny && areas[ttdata].uncatchable!=true && areas[ttdata].type != "dungeon") div.innerHTML = `<img alt="" class="sprite-trim" src="img/pkmn/shiny/${item.id}.png">` + tag;
         document.getElementById("area-preview-spawns").appendChild(div);
         }}
 
@@ -136,8 +136,8 @@ function tooltipData(category, ttdata){
         if (listName === "rare") { tag = `<span>¡Raro!</span>`; }
         if (listName === "uncommon") { tag = `<span>Uncommon</span>`; }
         div.className = "area-preview";
-        if (item.type!=="tm") div.innerHTML = `<img style="scale:2" src="img/items/${item.id}.png">` + tag;
-        if (item.type=="tm") div.innerHTML = `<img style="scale:2" src="img/items/tm${format(move[item.move].type)}.png">` + tag;
+        if (item.type!=="tm") div.innerHTML = `<img alt="" style="scale:2" src="img/items/${item.id}.png">` + tag;
+        if (item.type=="tm") div.innerHTML = `<img alt="" style="scale:2" src="img/items/tm${format(move[item.move].type)}.png">` + tag;
         document.getElementById("area-preview-items").appendChild(div);
         }}
 
@@ -191,8 +191,8 @@ function tooltipData(category, ttdata){
         const div = document.createElement("div");
         div.className = "area-preview";
         div.dataset.pkmn = item
-        div.innerHTML = `<img class="sprite-trim" src="img/pkmn/sprite/${item}.png">`;
-        if (pkmn[item].shiny && areas[ttdata].type != "vs" && areas[ttdata].type != "frontier") div.innerHTML = `<img class="sprite-trim" src="img/pkmn/shiny/${item}.png"> ${tag}`;
+        div.innerHTML = `<img alt="" class="sprite-trim" src="img/pkmn/sprite/${item}.png">`;
+        if (pkmn[item].shiny && areas[ttdata].type != "vs" && areas[ttdata].type != "frontier") div.innerHTML = `<img alt="" class="sprite-trim" src="img/pkmn/shiny/${item}.png"> ${tag}`;
         document.getElementById("area-preview-spawns").appendChild(div);
         }
 
@@ -206,9 +206,9 @@ function tooltipData(category, ttdata){
         if (item[i.id]!=undefined) {div.dataset.item = i.id; meow = "items" }
         else {div.dataset.pkmn = i.id;}
         div.className = "area-preview";
-        if (i.type!=="tm") div.innerHTML = `<img style="scale:2" src="img/${meow}/${i.id}.png">`;
-        if (i.type=="tm") div.innerHTML = `<img style="scale:2" src="img/${meow}/tm${format(move[i.move].type)}.png">` + tag;
-        if (meow == `pkmn/sprite`) div.innerHTML = `<img style="scale:1" src="img/${meow}/${i.id}.png">`;
+        if (i.type!=="tm") div.innerHTML = `<img alt="" style="scale:2" src="img/${meow}/${i.id}.png">`;
+        if (i.type=="tm") div.innerHTML = `<img alt="" style="scale:2" src="img/${meow}/tm${format(move[i.move].type)}.png">` + tag;
+        if (meow == `pkmn/sprite`) div.innerHTML = `<img alt="" style="scale:1" src="img/${meow}/${i.id}.png">`;
         document.getElementById("area-preview-items").appendChild(div);
         }
         }
@@ -241,7 +241,7 @@ function tooltipData(category, ttdata){
                     scale = 2;
                 }
                 
-                div.innerHTML = `<img style="scale:${scale}" src="img/${imgPath}.png" class="sprite-trim">`;
+                div.innerHTML = `<img alt="" style="scale:${scale}" src="img/${imgPath}.png" class="sprite-trim">`;
                 if (reward.amount > 1) {
                     div.innerHTML += `<span>x${reward.amount}</span>`;
                 }
@@ -288,7 +288,7 @@ function tooltipData(category, ttdata){
             let tag = "";
             if (areas[ttdata].difficulty == tier3difficulty) tag = `<span>¡Poco común!</span>`; 
             div.className = "area-preview";
-            div.innerHTML = `<img style="scale:2" src="img/items/${itemToAdd}.png">` + tag;
+            div.innerHTML = `<img alt="" style="scale:2" src="img/items/${itemToAdd}.png">` + tag;
             document.getElementById("area-preview-items").appendChild(div);
         }
 
@@ -375,7 +375,7 @@ function tooltipData(category, ttdata){
                 </div>
                 <div style="width: 8rem;" class="explore-ticket-right">
                     <span class="explore-ticket-bg" style="background-image: url(img/bg/${areas[i].background}.png);"></span>
-                    <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas[i].icon.id}.png">
+                    <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;" src="img/pkmn/sprite/${areas[i].icon.id}.png">
                 </div>
         `;
         document.getElementById("season-list").appendChild(divAreas);
@@ -427,7 +427,7 @@ function tooltipData(category, ttdata){
         </div>
         <div style="width: 8rem;" class="explore-ticket-right">
         <span class="explore-ticket-bg" style="filter:hue-rotate(-${season[saved.currentSeason].hue}deg); background-image: url(img/bg/${season[saved.currentSeason].background}.png);"></span>
-        <img class="explore-ticket-sprite sprite-trim" style="z-index: 10;  filter:hue-rotate(-${season[saved.currentSeason].hue}deg)" src="img/pkmn/sprite/${season[saved.currentSeason].icon.id}.png">
+        <img alt="" class="explore-ticket-sprite sprite-trim" style="z-index: 10;  filter:hue-rotate(-${season[saved.currentSeason].hue}deg)" src="img/pkmn/sprite/${season[saved.currentSeason].icon.id}.png">
         </div>
     `;
 
@@ -524,7 +524,7 @@ function tooltipData(category, ttdata){
     <div class="arena-card-title">
     Level 100
     <span>
-    Recompensa: x2<img  src="img/items/goldenBottleCap.png">
+    Recompensa: x2<img alt=""  src="img/items/goldenBottleCap.png">
     </span>
     </div>
 
@@ -536,7 +536,7 @@ function tooltipData(category, ttdata){
     <div class="arena-card-title">
     Level 125
     <span>
-    Recompensa: x3<img  src="img/items/goldenBottleCap.png">
+    Recompensa: x3<img alt=""  src="img/items/goldenBottleCap.png">
     </span>
     </div>
     <div id="arena-card-2-info" class="arena-card-info">
@@ -547,7 +547,7 @@ function tooltipData(category, ttdata){
     <div class="arena-card-title">
     Level 150
     <span>
-    Recompensa: x4<img  src="img/items/goldenBottleCap.png">
+    Recompensa: x4<img alt=""  src="img/items/goldenBottleCap.png">
     </span>
     </div>
     <div id="arena-card-3-info" class="arena-card-info">
@@ -662,7 +662,7 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
         divAreas.innerHTML = `
                         <span class="hitbox"></span>
 
-                <img class="vs-card-flair" src="img/icons/pokeball.svg">
+                <img alt="" class="vs-card-flair" src="img/icons/pokeball.svg">
                 <div class="vs-card-bg"></div>
                     <span class="explore-ticket-left" style="z-index: 2;">
                         <span style="font-size:1.3rem">${prefix}${i.replace(/frontier/gi, "")}${nameTag}</span>
@@ -671,7 +671,7 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
                 <div>
                 </div>
                 <div class="vs-card-left">
-                    <img id="trainer-image-${areas[i].name}" class="sprite-trim" src="img/trainers/${areas[i].sprite}.png">
+                    <img alt="" id="trainer-image-${areas[i].name}" class="sprite-trim" src="img/trainers/${areas[i].sprite}.png">
                 </div>
         `;
 
@@ -795,7 +795,7 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
 
         if (ttdata === `BattleFactory`) document.getElementById("tooltipTitle").innerHTML = `Fábrica de Combate`
         if (ttdata === `BattleFactory`) document.getElementById("tooltipBottom").innerHTML = `La Fábrica de Combate es un reto en el que tu objetivo es hacer el máximo daño posible. Cada turno recibes una cantidad fija de daño, y el daño de los estados alterados está desactivado.<br><br>Cada vez que entras en la fábrica tu puntuación se reinicia, pero puedes intentarlo tantas veces como quieras<br><br>Se guardará tu mejor puntuación, y se reinicia cuando cambia la rotación de liga. Recibirás una recompensa por tu mejor puntuación al terminar el combate<br><br>Se pueden conseguir un máximo de 100 Chapas Doradas`
-        if (ttdata === `BattleFactory`) document.getElementById("tooltipMid").innerHTML = `<div id="area-preview-spawns" data-pkmn="${areas.frontierBattleFactory.icon.id}"><strong>Pokémon de la Fábrica</strong><img class="sprite-trim" src="img/pkmn/sprite/${areas.frontierBattleFactory.icon.id}.png"></div>`;
+        if (ttdata === `BattleFactory`) document.getElementById("tooltipMid").innerHTML = `<div id="area-preview-spawns" data-pkmn="${areas.frontierBattleFactory.icon.id}"><strong>Pokémon de la Fábrica</strong><img alt="" class="sprite-trim" src="img/pkmn/sprite/${areas.frontierBattleFactory.icon.id}.png"></div>`;
         if (ttdata === `BattleFactory`) document.getElementById("tooltipMid").style.display = `inline`
 
         if (ttdata === `BattleArena`) document.getElementById("tooltipTitle").innerHTML = `Arena de Combate`
@@ -929,7 +929,7 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
 
         document.getElementById("tooltipTop").style.display = `inline`
         document.getElementById("tooltipTitle").style.display = `inline`
-        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${format(move[ttdata].type)}.png">`
+        document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/items/tm${format(move[ttdata].type)}.png">`
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipMid").style.display = "inline"
 
@@ -964,10 +964,10 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
     if (category=="item") {
 
         document.getElementById("tooltipTop").style.display = "flex"
-        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${format(move[item[ttdata].move].type)}.png">`
-        else if (item[ttdata].type == "memory") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/${item[ttdata].image}Memory.png">`
-        else if (item[ttdata].type == "decor") document.getElementById("tooltipTop").innerHTML = `<img src="img/decor/${ttdata}.png" style="scale:2">`
-        else  document.getElementById("tooltipTop").innerHTML = `<img src="img/items/${ttdata}.png">`
+        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/items/tm${format(move[item[ttdata].move].type)}.png">`
+        else if (item[ttdata].type == "memory") document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/items/${item[ttdata].image}Memory.png">`
+        else if (item[ttdata].type == "decor") document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/decor/${ttdata}.png" style="scale:2">`
+        else  document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/items/${ttdata}.png">`
 
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipTitle").style.display = "inline"
@@ -1009,8 +1009,8 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
             <strong  class="explore-pkmn-level">${format(ttdata)}</strong>
             <strong  class="inspect-pkmn-types" style="background:transparent;">${returnPkmnTypes(ttdata)}</strong>
             <div class="explore-sprite" id="inspect-pkmn-image">
-            <img  class="sprite-trim" style="animation: pkmn-active 0.5s infinite; z-index: 1;" src="img/pkmn/sprite/${ttdata}.png">
-            <img style="scale:1;animation: none; position: absolute; opacity: 0.3; width: 4.5rem; z-index: 0; transform: translateY(2.5rem);" src="img/resources/pkmn-shadow.png">
+            <img alt=""  class="sprite-trim" style="animation: pkmn-active 0.5s infinite; z-index: 1;" src="img/pkmn/sprite/${ttdata}.png">
+            <img alt="" style="scale:1;animation: none; position: absolute; opacity: 0.3; width: 4.5rem; z-index: 0; transform: translateY(2.5rem);" src="img/resources/pkmn-shadow.png">
             </div>
             
             </div>
@@ -1176,7 +1176,7 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
             for (const e of poke.ribbons){
 
                 const ribbonDiv = document.createElement("span")
-                ribbonDiv.innerHTML = `<img src="img/ribbons/${e}.png">`
+                ribbonDiv.innerHTML = `<img alt="" src="img/ribbons/${e}.png">`
                 ribbonDiv.dataset.ribbon = e
                 document.getElementById(`pkmn-editor-ribbons`).appendChild(ribbonDiv)
 
@@ -1476,7 +1476,7 @@ frontierArray.sort((a, b) => a.data.tier - b.data.tier);
     `<div
     class="pkmn-movebox-progress" style="background: ${returnTypeColor(move[ moveId ].type)} "></div><span>`
     + format(moveId) + signatureIcon +
-     `</span></span><strong>(${move[moveId].power} BP, ${format(move[moveId].split)})</strong><img style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">`
+     `</span></span><strong>(${move[moveId].power} BP, ${format(move[moveId].split)})</strong><img alt="" style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">`
 
      divMove.dataset.move = moveId
 
@@ -1602,7 +1602,7 @@ const sortedMovepool = movepool
     `<div
     class="pkmn-movebox-progress" style="background: ${returnTypeColor(move[ moveId ].type)} "></div><span>`
     + format(moveId) + signatureIcon +
-     `</span><strong>(${move[moveId].power} BP, ${format(move[moveId].split)})</strong><img style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">`
+     `</span><strong>(${move[moveId].power} BP, ${format(move[moveId].split)})</strong><img alt="" style="background: ${returnTypeColor(move[ moveId ].type)} " src="img/icons/${move[ moveId ].type }.svg">`
 
      divMove.dataset.move = moveId
 
@@ -1679,7 +1679,7 @@ const sortedMovepool = movepool
 
         document.getElementById("tooltipTop").style.display = `inline`
         document.getElementById("tooltipTitle").style.display = `inline`
-        document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${format(move[ttdata].type)}.png">`
+        document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/items/tm${format(move[ttdata].type)}.png">`
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipMid").style.display = "inline"
 
@@ -1744,9 +1744,9 @@ const sortedMovepool = movepool
 
         document.getElementById("tooltipTop").style.display = `inline`
         document.getElementById("tooltipTitle").style.display = `none`
-        document.getElementById("tooltipTop").innerHTML = `<div style="cursor:help" data-pkmn="${ttdata}"><img src="img/pkmn/sprite/${ttdata}.png"></div>`
-        if (pkmn[ttdata].shiny) document.getElementById("tooltipTop").innerHTML = `<div style="cursor:help" data-pkmn="${ttdata}"><img src="img/pkmn/shiny/${ttdata}.png"></div>`
-        //if (pkmn[ttdata].caught == 0) document.getElementById("tooltipTop").innerHTML = `<div><img style="filter:brightness(0)" src="img/pkmn/sprite/${ttdata}.png"></div>`
+        document.getElementById("tooltipTop").innerHTML = `<div style="cursor:help" data-pkmn="${ttdata}"><img alt="" src="img/pkmn/sprite/${ttdata}.png"></div>`
+        if (pkmn[ttdata].shiny) document.getElementById("tooltipTop").innerHTML = `<div style="cursor:help" data-pkmn="${ttdata}"><img alt="" src="img/pkmn/shiny/${ttdata}.png"></div>`
+        //if (pkmn[ttdata].caught == 0) document.getElementById("tooltipTop").innerHTML = `<div><img alt="" style="filter:brightness(0)" src="img/pkmn/sprite/${ttdata}.png"></div>`
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipMid").style.display = "inline"
 
@@ -1836,10 +1836,10 @@ const sortedMovepool = movepool
         document.getElementById("tooltipTitle").innerHTML = format(ttdata)
         document.getElementById("tooltipMid").style.display = "inline"
 
-        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/tm${format(move[item[ttdata].move].type)}.png">`
-        else if (item[ttdata].type == "memory") document.getElementById("tooltipTop").innerHTML = `<img src="img/items/${item[ttdata].image}Memory.png">`
-        else if (item[ttdata].type == "decor") document.getElementById("tooltipTop").innerHTML = `<img src="img/decor/${ttdata}.png" style="scale:2">`
-        else  document.getElementById("tooltipTop").innerHTML = `<img src="img/items/${ttdata}.png">`
+        if (item[ttdata].type == "tm") document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/items/tm${format(move[item[ttdata].move].type)}.png">`
+        else if (item[ttdata].type == "memory") document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/items/${item[ttdata].image}Memory.png">`
+        else if (item[ttdata].type == "decor") document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/decor/${ttdata}.png" style="scale:2">`
+        else  document.getElementById("tooltipTop").innerHTML = `<img alt="" src="img/items/${ttdata}.png">`
 
 
 

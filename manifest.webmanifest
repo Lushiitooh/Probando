@@ -1,0 +1,16 @@
+{
+  "name": "Pokechill",
+  "short_name": "Pokechill",
+  "description": "Un idle de monstruos: prepara tu equipo y deja que el combate se resuelva solo.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#2b2622",
+  "theme_color": "#2b2622",
+  "icons": [
+    { "src": "img/icons/icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/icons/icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

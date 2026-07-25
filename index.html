@@ -6,6 +6,10 @@
     <title>Pokechill</title>
     <link rel="icon" type="image/x-icon" href="/img/icons/icon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#2b2622">
+    <meta name="description" content="Un idle de monstruos: prepara tu equipo y deja que el combate se resuelva solo.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
 
 
@@ -269,7 +273,7 @@
 
     <div id="pokedex-menu" style="display: none;">
 
-        <img class="pokedex-menu-flair" src="img/icons/pokeball.svg">
+        <img alt="" class="pokedex-menu-flair" src="img/icons/pokeball.svg">
         <svg id="pokedex-menu-return" onclick="
   document.getElementById('pokedex-menu').scrollTo({
     top: 0,
@@ -487,6 +491,30 @@
                 <option value="10">x10 turbo</option>
             </select></div>
 
+            <div data-help="settingsVolumen" style="cursor: help;">Volumen: <select id="settings-volumen">
+                <option value="0">silencio</option>
+                <option value="0.3">bajo</option>
+                <option value="0.6">medio</option>
+                <option value="1">alto</option>
+            </select></div>
+
+            <div data-help="settingsDaltonico" style="cursor: help;">Modo daltónicos: <select id="settings-daltonico">
+                <option value="false">desactivado</option>
+                <option value="true">activado</option>
+            </select></div>
+
+            <div data-help="settingsAnimaciones" style="cursor: help;">Animaciones: <select id="settings-animaciones">
+                <option value="false">activadas</option>
+                <option value="true">reducidas</option>
+            </select></div>
+
+            <div data-help="settingsCompacto" style="cursor: help;">Modo compacto: <select id="settings-compacto">
+                <option value="false">desactivado</option>
+                <option value="true">activado</option>
+            </select></div>
+
+            <div onclick="Extras.pedirPermisoNotificaciones()">Activar notificaciones</div>
+
             <div data-help="settingsNewPkmn" style="cursor: help;">Ocultar Pokémon no nuevos en el resumen: <select id="settings-hide-got">
                 <option value="false">desactivado</option>
                 <option value="true">activado</option>
@@ -501,6 +529,25 @@
                 <option value="enabled">activado</option>
                 <option value="disabled">desactivado</option>
             </select></div>-->
+
+            <div onclick="Paneles.pintarEstadisticas()">Estadísticas</div>
+            <div onclick="Paneles.pintarLogros()">Logros</div>
+            <div onclick="Paneles.pintarMisiones()">Misiones diarias</div>
+            <div onclick="Paneles.pintarPrestigio()">Prestigio</div>
+            <div onclick="Paneles.pintarCopias()">Copias de seguridad</div>
+            <div onclick="Paneles2.rotacion()">Rotación y cruce</div>
+            <div onclick="Paneles2.simulador()">Simulador de daño</div>
+            <div onclick="Paneles2.comparador()">Comparador</div>
+            <div onclick="Paneles2.busqueda()">Búsqueda global</div>
+            <div onclick="Paneles2.galeria()">Galería</div>
+            <div onclick="Paneles2.pokedexViviente()">Pokédex viviente</div>
+            <div onclick="Paneles2.pase()">Pase de temporada</div>
+            <div onclick="Paneles2.reciclaje()">Reciclaje</div>
+            <div onclick="Paneles2.mazmorra()">Mazmorra del día</div>
+            <div onclick="Paneles2.aliado()">Aliado cooperativo</div>
+            <div onclick="Paneles2.graficas()">Gráficas de progreso</div>
+            <div onclick="Paneles2.ranuras()">Ranuras de partida</div>
+            <div onclick="Paneles2.tema()">Tema personalizado</div>
 
             <div 
             onclick='document.getElementById("tooltipTop").style.display = `none`
@@ -551,15 +598,15 @@
         <div class="starter-list">
 
             <div data-pkmn="litten" onClick="document.getElementById('starter-menu').style.pointerEvents = 'none'; item.charcoal.got++; givePkmn(pkmn.litten,10); voidAnimation('starter-menu','tooltipBoxAppear 0.2s 1 reverse'); setTimeout(() => { document.getElementById('starter-menu').style.display = 'none' }, 150); ">
-                <img src="img/pkmn/sprite/litten.png">Litten<br>Tipo Fuego
+                <img alt="" src="img/pkmn/sprite/litten.png">Litten<br>Tipo Fuego
             </div>
 
             <div data-pkmn="turtwig" onClick="document.getElementById('starter-menu').style.pointerEvents = 'none'; item.miracleSeed.got++; givePkmn(pkmn.turtwig,10); voidAnimation('starter-menu','tooltipBoxAppear 0.2s 1 reverse'); setTimeout(() => { document.getElementById('starter-menu').style.display = 'none' }, 150); ">
-                <img src="img/pkmn/sprite/turtwig.png">Turtwig<br>Tipo Planta
+                <img alt="" src="img/pkmn/sprite/turtwig.png">Turtwig<br>Tipo Planta
             </div>
 
             <div data-pkmn="froakie" onClick="document.getElementById('starter-menu').style.pointerEvents = 'none'; item.mysticWater.got++; givePkmn(pkmn.froakie,10); voidAnimation('starter-menu','tooltipBoxAppear 0.2s 1 reverse'); setTimeout(() => { document.getElementById('starter-menu').style.display = 'none' }, 150); ">
-                <img src="img/pkmn/sprite/froakie.png">Froakie<br>Tipo Agua
+                <img alt="" src="img/pkmn/sprite/froakie.png">Froakie<br>Tipo Agua
             </div>
 
         <span style="color: white; background: transparent; padding: 0 2rem;">Consejo: haz clic derecho (o pulsación larga en móvil) sobre casi cualquier elemento para ver más información</span>
@@ -573,7 +620,7 @@
 
 
 
-        <img class="sprite-trim" src="img/pkmn/sprite/pikachuPhd.png">
+        <img alt="" class="sprite-trim" src="img/pkmn/sprite/pikachuPhd.png">
         <span id="tutorial-text">Durante el combate, los Pokémon se cansan y pierden una fracción muy pequeña de sus PS, etcétera.</span>
        </div>
 
@@ -616,12 +663,12 @@ Guía del juego
         <div class="training-flex">
 
             <div class="training-flex-1">
-            <div id="training-sprite-div" style="z-index: 10;"><img class="sprite-trim"  style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: 0rem;" src="img/pkmn/sprite/wobbuffet.png"></div>
-            <img style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 3; transform: translateY(0.5rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">
+            <div id="training-sprite-div" style="z-index: 10;"><img alt="" class="sprite-trim"  style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: 0rem;" src="img/pkmn/sprite/wobbuffet.png"></div>
+            <img alt="" style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 3; transform: translateY(0.5rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">
             </div>
 
             <div class="training-flex-2">
-            <img src="img/resources/training-sack.png" id="training-sack">
+            <img alt="" src="img/resources/training-sack.png" id="training-sack">
             </div>
 
 
@@ -693,8 +740,8 @@ Guía del juego
             <div class="genetics-header-flex">
 
             <div style="position: relative; display: flex; justify-content: center;align-items: center; width:10rem" id="genetics-host-div">
-            <img class="sprite-trim" style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: -4.5rem;" id="genetics-host" src="img/pkmn/sprite/magikarp.png">
-            <img style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 0; transform: translateY(0.5rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">
+            <img alt="" class="sprite-trim" style="z-index: 1; transform-origin: bottom; margin-top: auto; position: absolute; bottom: -4.5rem;" id="genetics-host" src="img/pkmn/sprite/magikarp.png">
+            <img alt="" style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 0; transform: translateY(0.5rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">
             </div>
 
             <div id="genetics-arrow">
@@ -703,7 +750,7 @@ Guía del juego
             </div>
 
             <div class="genetics-sample" id="genetics-sample-div">
-            <img class="sprite-trim" style="animation: none; z-index: 1;" id="genetics-sample" src="img/pkmn/sprite/arceus.png">
+            <img alt="" class="sprite-trim" style="animation: none; z-index: 1;" id="genetics-sample" src="img/pkmn/sprite/arceus.png">
             </div>
 
             </div>
@@ -800,12 +847,12 @@ Guía del juego
 
             <div style="display: flex; margin-top: 0rem; gap:0.5rem" >
             <div class="shop-currency" id="shop-currency" data-item="bottleCap">
-                    <img src="img/items/bottleCap.png"> x12
+                    <img alt="" src="img/items/bottleCap.png"> x12
             </div>
           
             
             <div class="shop-currency" id="shop-currency-gold" data-item="goldenBottleCap">
-                    <img src="img/items/goldenBottleCap.png"> x123
+                    <img alt="" src="img/items/goldenBottleCap.png"> x123
             </div>
             </div>
 
@@ -815,13 +862,13 @@ Guía del juego
         <div id="shop-curry">
         <h1 id="curry-title">¡Elige ingredientes para el curry! [5/5]</h1>
         <span id="curry-ingredients">
-            <img src="img/items/boiledEgg.png">
-            <img src="img/items/boiledEgg.png">
-            <img src="img/items/bread.png">
-            <img src="img/items/freshCream.png">
-            <img src="img/items/freshCream.png">
+            <img alt="" src="img/items/boiledEgg.png">
+            <img alt="" src="img/items/boiledEgg.png">
+            <img alt="" src="img/items/bread.png">
+            <img alt="" src="img/items/freshCream.png">
+            <img alt="" src="img/items/freshCream.png">
         </span>
-        <img id="curry-pot" src="img/icons/curry.png">
+        <img alt="" id="curry-pot" src="img/icons/curry.png">
         <div id="curry-effects">
             <span>~ Efectos actuales ~</span>
             <div>x1.2 objetos</div>
@@ -830,7 +877,7 @@ Guía del juego
         </div>
         <div id="curry-buttons">
             <div onclick='curryIngredientList = []; updateCurry()'>Reiniciar</div>
-            <div id='curry-pay' onclick='makeCurry()'>Pagar y cocinar (25 <img src="img/items/goldenBottleCap.png">)</div>
+            <div id='curry-pay' onclick='makeCurry()'>Pagar y cocinar (25 <img alt="" src="img/items/goldenBottleCap.png">)</div>
         </div>
 
         </div>
@@ -839,43 +886,43 @@ Guía del juego
         <div id="shop-categories">
 
             <div onclick="shopCategory = 'goods'; updateItemShop() ">
-                <img src="img/items/rareCandy.png">Artículos
+                <img alt="" src="img/items/rareCandy.png">Artículos
             </div>
 
             <div onclick="shopCategory = 'held'; updateItemShop() ">
-                <img src="img/items/choiceBand.png">Equip.
+                <img alt="" src="img/items/choiceBand.png">Equip.
             </div>
 
             <div onclick="shopCategory = 'evolution'; updateItemShop() ">
-                <img src="img/items/waterStone.png">Evolución
+                <img alt="" src="img/items/waterStone.png">Evolución
             </div>
 
             <div onclick="shopCategory = 'tm'; updateItemShop() ">
-                <img src="img/items/tmDummy.png">MTs
+                <img alt="" src="img/items/tmDummy.png">MTs
             </div>
 
             <div onclick="shopCategory = 'genetics'; updateItemShop() ">
-                <img src="img/items/destinyKnot.png">Genética
+                <img alt="" src="img/items/destinyKnot.png">Genética
             </div>
 
             <div onclick="shopCategory = 'pokemon'; updateItemShop() ">
-                <img src="img/items/pokeball.png">Pokemon
+                <img alt="" src="img/items/pokeball.png">Pokemon
             </div>
 
             <div onclick="shopCategory = 'memory'; updateItemShop() ">
-                <img src="img/items/darkMemory.png">Disco
+                <img alt="" src="img/items/darkMemory.png">Disco
             </div>
 
             <div onclick="shopCategory = 'decor'; updateItemShop() ">
-                <img src="img/items/blackGlasses.png">Adornos
+                <img alt="" src="img/items/blackGlasses.png">Adornos
             </div>
 
             <div onclick="shopCategory = 'restaurant'; updateItemShop() " id="shop-restaurant">
-                <img src="img/items/boiledEgg.png">Restaurante
+                <img alt="" src="img/items/boiledEgg.png">Restaurante
             </div>
 
             <div onclick="shopCategory = 'apricorn'; updateItemShop() " id="shop-apricorn-exchange">
-                <img src="img/items/blueApricorn.png">Canjear
+                <img alt="" src="img/items/blueApricorn.png">Canjear
             </div>
 
 
@@ -885,10 +932,10 @@ Guía del juego
             <div id="shop-listing" style="display: none;">
 
             <div>
-                <img src="img/items/calcium.png">
+                <img alt="" src="img/items/calcium.png">
                 <span>Frasco de Calcio</span>
                 <strong>
-                    <img src="img/items/bottleCap.png">
+                    <img alt="" src="img/items/bottleCap.png">
                     x12
                 </strong>
             </div>
@@ -920,7 +967,7 @@ Guía del juego
 
             Calculando el tiempo AFK, espera un momento...
 
-                                                    <img src="img/icons/porygon.gif">
+                                                    <img alt="" src="img/icons/porygon.gif">
 
         </div>
 
@@ -931,9 +978,9 @@ Guía del juego
 
 
             <div class="wonder-content">
-                <img id="wonder-ball" src="img/items/beastball.png">
-                <img id="wonder-pkmn" class="sprite-trim" src="img/pkmn/sprite/dialga.png">
-                <img src="img/resources/pkmn-shadow.png" style="opacity: 0.5; margin-bottom:7rem; margin-top: -5rem;">
+                <img alt="" id="wonder-ball" src="img/items/beastball.png">
+                <img alt="" id="wonder-pkmn" class="sprite-trim" src="img/pkmn/sprite/dialga.png">
+                <img alt="" src="img/resources/pkmn-shadow.png" style="opacity: 0.5; margin-bottom:7rem; margin-top: -5rem;">
                 <div id="wonder-text" onclick="document.getElementById('wonder-menu').style.display = 'none'">¡Gracias por el Dialga!</div>
             </div>
 
@@ -948,8 +995,8 @@ Guía del juego
             <div class="decor-content">
                 <div>Arrastra y suelta la decoración seleccionada para aplicarla</div>
                 <span class="sprite-box">
-                <img class="sprite-decor" id="pkmn-decor-item">
-                <img class="sprite-trim" id="pkmn-decor-dress" src="img/pkmn/sprite/gengar.png">
+                <img alt="" class="sprite-decor" id="pkmn-decor-item">
+                <img alt="" class="sprite-trim" id="pkmn-decor-dress" src="img/pkmn/sprite/gengar.png">
                 </span>
             </div>
 
@@ -994,9 +1041,9 @@ Guía del juego
 
         <div class="dimension-pokemon">
             <div id="dimension-indicator">★★★</div>
-            <img class="dimension-bhole" style="animation: rotate 20s infinite linear reverse; scale: 1.3;" src="img/icons/bhole.png">
-            <img class="dimension-bhole" src="img/icons/bhole.png">
-            <img class="dimension-sprite sprite-trim" src="img/pkmn/sprite/regigigas.png">
+            <img alt="" class="dimension-bhole" style="animation: rotate 20s infinite linear reverse; scale: 1.3;" src="img/icons/bhole.png">
+            <img alt="" class="dimension-bhole" src="img/icons/bhole.png">
+            <img alt="" class="dimension-sprite sprite-trim" src="img/pkmn/sprite/regigigas.png">
         </div>
 
 
@@ -1087,7 +1134,6 @@ Guía del juego
 
 
 
-       <!--
 
     <div id="custom-challenges-menu" style="display: none;" class="season-background">
 
@@ -1140,7 +1186,6 @@ Guía del juego
 
        </div>
 
-       -->
 
 
 
@@ -1218,7 +1263,7 @@ Guía del juego
 
     <div id="area-refight" class="leave-button"  onClick='    afkSeconds = 0; autoRefight();'>
     <svg style="margin-right:0.3rem" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M10.797 2.482a.61.61 0 0 1 0 .866L9.44 4.705h.924c1.393 0 2.305.572 2.845 1.343c.515.736.651 1.593.651 2.153c0 .561-.136 1.418-.651 2.154c-.54.77-1.452 1.342-2.845 1.342c-.948 0-1.695-.48-2.295-1.08c-.584-.584-1.093-1.347-1.56-2.046l-.019-.03c-.49-.734-.936-1.4-1.425-1.889c-.481-.48-.935-.721-1.429-.721c-1.01 0-1.54.39-1.84.82c-.327.466-.43 1.05-.43 1.45s.103.985.43 1.451c.3.43.83.82 1.84.82c.512 0 .982-.259 1.482-.775a.613.613 0 0 1 .88.852c-.612.632-1.379 1.148-2.362 1.148c-1.393 0-2.305-.571-2.845-1.342C.276 9.619.14 8.762.14 8.2s.137-1.418.651-2.153c.54-.77 1.452-1.343 2.845-1.343c.948 0 1.695.48 2.295 1.08c.584.585 1.093 1.348 1.56 2.047l.019.03c.49.734.936 1.4 1.425 1.889c.481.48.935.721 1.429.721c1.01 0 1.54-.39 1.84-.82c.327-.466.43-1.05.43-1.45s-.103-.986-.43-1.451c-.3-.43-.83-.82-1.84-.82H7.961a.613.613 0 0 1-.433-1.046L9.93 2.482a.61.61 0 0 1 .866 0" clip-rule="evenodd"/></svg>
-    Revancha automática <span> (Necesitas un <img src="img/items/autoRefightTicket.png"> Ticket de Revancha Automática)</span>
+    Revancha automática <span> (Necesitas un <img alt="" src="img/items/autoRefightTicket.png"> Ticket de Revancha Automática)</span>
     </div>
 
 
@@ -1277,8 +1322,8 @@ Guía del juego
 
 
             <div class="explore-sprite sprite-box" style="cursor: default; animation: pkmn-active 0.5s infinite; margin-right: 1.5rem;">
-            <img class="sprite-decor" id="pkmn-edit-decor" >
-            <img class="sprite-trim" style=" z-index: 1;" src="img/pkmn/sprite/mew.png" id="pkmn-editor-sprite">
+            <img alt="" class="sprite-decor" id="pkmn-edit-decor" >
+            <img alt="" class="sprite-trim" style=" z-index: 1;" src="img/pkmn/sprite/mew.png" id="pkmn-editor-sprite">
             </div>
 
             <div id="pkmn-editor-ribbons">
@@ -1479,73 +1524,71 @@ Guía del juego
         document.getElementById("tooltipBottom").innerHTML = joinWithAnd(saved.curry.effect)
         openTooltip()
         '>
-        <img src="img/items/friedFood.png"> 38:21
+        <img alt="" src="img/items/friedFood.png"> 38:21
     </div>
 
     <div id="menu-items">
 
 
         <div class="menu-item" id="menu-item-travel" onClick="switchMenu('travel')">
-            <img src="img/items/oldMap.png">
+            <img alt="" src="img/items/oldMap.png">
             <span>Viajar</span>
         </div>
 
         <div class="menu-item" id="menu-item-vs" onClick="switchMenu('vs')">
-            <img src="img/items/vs.png">
+            <img alt="" src="img/items/vs.png">
             <span>VS</span>
         </div>
 
         <div class="menu-item" id="menu-item-items" onClick="switchMenu('items')">
-            <img src="img/items/items.png">
+            <img alt="" src="img/items/items.png">
             <span>Objetos</span>
         </div>
 
         <div class="menu-item" id="menu-item-team" onClick="switchMenu('team')">
-            <img src="img/items/pokeball.png">
+            <img alt="" src="img/items/pokeball.png">
             <span>Equipo</span>
         </div>
 
         <div class="menu-item" id="menu-item-dex" onClick="switchMenu('dex')">
-            <img src="img/items/dex.png">
+            <img alt="" src="img/items/dex.png">
             <span>Dex</span>
         </div>
 
         <div class="menu-item" id="menu-item-shop" onClick="switchMenu('shop')">
-            <img src="img/items/maxPotion.png">
+            <img alt="" src="img/items/maxPotion.png">
             <span>Poké Tienda</span>
         </div>
 
         <div class="menu-item" id="menu-item-training" onClick="switchMenu('training')">
-            <img src="img/items/blackBelt.png">
+            <img alt="" src="img/items/blackBelt.png">
             <span>Entrenamiento</span>
         </div>
 
-        <!--
 
         <div class="menu-item" id="menu-item-custom-challenges" onClick="switchMenu('custom-challenges')">
-            <img src="img/items/endorsement.png">
+            <img src="img/items/endorsement.png" alt="">
             <span>Retos</span>
         </div>
 
-        -->
 
         <div class="menu-item" id="menu-item-genetics" onClick="switchMenu('genetics')">
-            <img src="img/items/dnaSplicer.png">
+            <img alt="" src="img/items/dnaSplicer.png">
             <span>Genética</span>
         </div>
 
         <div class="menu-item" id="menu-mystery-gift" onClick="claimMysteryGift()">
-            <img src="img/items/gift.png">
+            <img alt="" src="img/items/gift.png">
             <span>Regalo Misterioso</span>
         </div>
 
         <div class="menu-item" id="menu-export-reward" onClick="claimExportReward()">
-            <img src="img/items/parcel.png">
+            <img alt="" src="img/items/parcel.png">
             <span>Recompensa de exportación</span>
         </div>
 
         <div class="menu-item" id="menu-wonder-trade" onClick="claimWonderTrade()">
-            <img src="img/items/beastball.png">
+            <img alt="" src="img/items/beastball.png">
             <span>Intercambio Milagroso</span>
         </div>
 
@@ -1553,28 +1596,28 @@ Guía del juego
 
 
         <div class="menu-item" id="menu-dimension" onClick="switchMenu('dimension')">
-            <img src="img/items/megaChunk.png">
+            <img alt="" src="img/items/megaChunk.png">
             <span>Megadimensión</span>
         </div>
 
 
         <div class="menu-item" id="menu-item-dictionary" onClick="switchMenu('dictionary')">
-            <img src="img/items/journal.png">
+            <img alt="" src="img/items/journal.png">
             <span>Diccionario</span>
         </div>
 
         <div class="menu-item" id="menu-item-guide" onClick="switchMenu('guide')">
-            <img src="img/items/tv.png">
+            <img alt="" src="img/items/tv.png">
             <span>Guía</span>
         </div>
 
         <div class="menu-item" id="menu-item-settings" onClick="switchMenu('settings')">
-            <img src="img/items/key.png">
+            <img alt="" src="img/items/key.png">
             <span>Ajustes</span>
         </div>
 
         <div class="menu-item" id="menu-item-fullscreen" onclick="document.documentElement.requestFullscreen(); openMenu()">
-            <img src="img/items/wideLens.png">
+            <img alt="" src="img/items/wideLens.png">
             <span>Pantalla completa</span>
         </div>
 
@@ -1590,12 +1633,12 @@ Guía del juego
         <div id="explore-header">
             <div id="team-indicator">
 
-                <img id="team-indicator-slot-1"src="img/icons/pokeball.svg">
-                <img id="team-indicator-slot-2"src="img/icons/pokeball.svg">
-                <img id="team-indicator-slot-3"src="img/icons/pokeball.svg">
-                <img id="team-indicator-slot-4"src="img/icons/pokeball.svg">
-                <img id="team-indicator-slot-5"src="img/icons/pokeball.svg">
-                <img id="team-indicator-slot-6"src="img/icons/pokeball.svg">
+                <img alt="" id="team-indicator-slot-1"src="img/icons/pokeball.svg">
+                <img alt="" id="team-indicator-slot-2"src="img/icons/pokeball.svg">
+                <img alt="" id="team-indicator-slot-3"src="img/icons/pokeball.svg">
+                <img alt="" id="team-indicator-slot-4"src="img/icons/pokeball.svg">
+                <img alt="" id="team-indicator-slot-5"src="img/icons/pokeball.svg">
+                <img alt="" id="team-indicator-slot-6"src="img/icons/pokeball.svg">
 
             </div>
 
@@ -1621,8 +1664,8 @@ Guía del juego
             <div style="display: flex; width: 100%;">
 
             <div class="explore-sprite" id="explore-wild-sprite-data" style="cursor: help;">
-            <img class="sprite-trim" style="animation: none; z-index: 1;" id="explore-wild-sprite" src="img/resources/none.png">
-            <img style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 0; transform: translateY(2rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">
+            <img alt="" class="sprite-trim" style="animation: none; z-index: 1;" id="explore-wild-sprite" src="img/resources/none.png">
+            <img alt="" style="animation: none; position: absolute; opacity: 0.4; width: 4.5rem; z-index: 0; transform: translateY(2rem); image-rendering: initial;" src="img/resources/pkmn-shadow.png">
             <div id="wild-buff-list">
                 
             </div>
@@ -1724,13 +1767,10 @@ Guía del juego
     <script src="scripts/PR/autoTeamBuilding.js"></script>
     <script src="scripts/PR/movesetGenerator.js"></script>
     <script src="scripts/PR/teamDuplicate.js"></script>
-    <script src="scripts/PR/updateCheck.js"></script>
     
 
-    <!--
     <script src="scripts/PR/challengesDictionary.js"></script>
     <script src="scripts/PR/challenges.js"></script>
-    -->
 
 
 
@@ -1742,7 +1782,24 @@ Guía del juego
     <script src="scripts/tooltip.js"></script>
     <script src="scripts/decor.js"></script>
 
+    <script src="scripts/extras.js"></script>
+    <script src="scripts/progreso.js"></script>
+    <script src="scripts/paneles.js"></script>
+    <script src="scripts/combate2.js"></script>
+    <script src="scripts/coleccion.js"></script>
+    <script src="scripts/paneles2.js"></script>
     <script src="scripts/save.js"></script>
+    <script>
+    // Registro del service worker: hace el juego instalable y jugable sin
+    // conexión. Solo bajo http(s); con file:// no está permitido.
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(e =>
+                console.info('Service worker no registrado:', e.message));
+        });
+    }
+    </script>
+
 </body>
 </html>
 
