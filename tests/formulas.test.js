@@ -348,6 +348,29 @@ comprobarQue('equiparObjetosDelEquipo no borra el objeto cuando no hay asignaci√
              !/\.item\s*=\s*s\.item\s*\|\|\s*undefined/.test(fuenteAsesor));
 
 
+/* ------------- 14. EL CRISTAL Z NO SE NORMALIZA CONTRA SUS PROPIOS MOVIMIENTOS
+   El golpe Z se calcula solo con las ESTADISTICAS del portador
+   (explore.js:2977-3020) y el contador avanza con los turnos del miembro
+   activo. Si se divide por el dano medio de los movimientos del portador, el
+   cociente sale mayor cuanto PEORES son sus movimientos, y el unico cristal
+   permitido acaba en el peor atacante del equipo.                          */
+
+comprobarQue('la puntuacion del cristal Z usa una referencia comun del equipo',
+             /pelea\.referenciaDano/.test(fuenteAsesor));
+
+
+/* ------------------ 15. CADA ORBE DE ESTADO CASTIGA SU CATEGORIA
+   En este juego esta AL REVES de los juegos oficiales: la quemadura divide
+   el dano FISICO (explore.js:2699, bloque de atkup) y el veneno divide el
+   ESPECIAL (explore.js:2675, bloque de satkup).                            */
+
+const bloqueOrbes = fuenteAsesor.slice(fuenteAsesor.indexOf("idItem === 'flameOrb'"),
+                                       fuenteAsesor.indexOf("idItem === 'flameOrb'") + 700);
+comprobarQue('los orbes distinguen fisico de especial',
+             /flameOrb.*\?.*physical.*:.*special|physical' : 'special/.test(bloqueOrbes)
+             || (bloqueOrbes.includes("'physical'") && bloqueOrbes.includes("'special'")));
+
+
 /* --------------------------------------------------------------- informe */
 
 console.log('');

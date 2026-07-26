@@ -503,8 +503,16 @@ API.puntuarObjeto = function (idItem, idPkmn, movs, pelea) {
        Funciona desde cualquier ranura, pero solo se admite uno por equipo. */
     if (it.zType) {
         const turnos = Math.max(1, pot);
+        // La referencia NO puede ser el daño de los movimientos del portador:
+        // el golpe Z se calcula solo con sus ESTADÍSTICAS (explore.js:2977-3020)
+        // y el contador avanza con los turnos del miembro activo, no con los
+        // suyos. Al dividir por su propio daño, el cociente salía mayor cuanto
+        // PEORES eran sus movimientos, así que el único cristal permitido
+        // acababa en el peor atacante del equipo. Se normaliza contra una
+        // referencia común, la misma para todos los candidatos.
         const datos  = pesosDeDano(p, movs, pelea);
-        const medio  = datos.total / Math.max(1, conDano.length);
+        const propio = datos.total / Math.max(1, conDano.length);
+        const medio  = pelea.referenciaDano || propio;
         if (!medio) return 0;
         const fisico = p.bst.atk >= p.bst.satk;
         const atk    = fisico ? p.bst.atk : p.bst.satk;
@@ -555,16 +563,17 @@ API.puntuarObjeto = function (idItem, idPkmn, movs, pelea) {
         return Math.max(0, (pot - 1) * 100 - 30);
 
     // Orbes de estado: multiplican siempre, pero se autoinfligen un estado que
-    // hace daño por turno (explore.js:3195-3196). Ese daño es vida máxima/50,
-    // salvo en zonas de entrenador, donde es /12: igual que la Vidasfera.
-    // Además SOLO la quemadura divide el daño físico por 1.5 (explore.js:2699);
-    // el Orbe Tóxico envenena, así que no le corresponde ese castigo.
+    // hace daño por turno (explore.js:3195-3196): vida máxima/50, y /12 en
+    // zonas de entrenador, igual que la Vidasfera.
+    // OJO con qué divide cada estado, porque aquí está AL REVÉS de los juegos
+    // oficiales: la quemadura divide el daño FÍSICO (explore.js:2699, dentro
+    // del bloque de atkup) y el veneno divide el ESPECIAL (explore.js:2675,
+    // dentro del bloque de satkup). Cada orbe castiga su categoría.
     if (idItem === 'flameOrb' || idItem === 'toxicOrb') {
         const residual = 100 / (pelea.esEntrenador ? 12 : 50);
-        let mult = pot;
-        if (idItem === 'flameOrb')
-            mult = pot / (1 + 0.5 * fraccionDano(p, movs, pelea, mv => mv.split === 'physical'));
-        return (mult - 1) * 100 - residual * 4.5 * def;
+        const categoria = idItem === 'flameOrb' ? 'physical' : 'special';
+        const castigada = fraccionDano(p, movs, pelea, mv => mv.split === categoria);
+        return (pot / (1 + 0.5 * castigada) - 1) * 100 - residual * 4.5 * def;
     }
 
     // Cintas de elección: solo su categoría, y bloquean el relevo.
@@ -652,6 +661,23 @@ API.repartirObjetos = function (seleccion, pelea) {
     // El juego solo admite UN cristal Z por equipo (teams.js:365-381): si se
     // reparten dos, la pantalla de equipo da error al guardar.
     let zUsado = false;
+
+    // Referencia común para puntuar el cristal Z: el daño medio por movimiento
+    // del equipo. Tiene que ser la MISMA para los seis, porque el golpe Z no
+    // depende de los movimientos de quien lo lleva. Sin esto, el cristal se lo
+    // quedaba el peor atacante.
+    (function fijarReferencia() {
+        let suma = 0, n = 0;
+        for (const s of seleccion) {
+            const p = pkmn[s.id];
+            if (!p || !s.movs || !s.movs.length) continue;
+            const d = pesosDeDano(p, s.movs, pelea);
+            const conDano = s.movs.filter(m => move[m] && move[m].power > 0).length;
+            if (!conDano) continue;
+            suma += d.total / conDano; n++;
+        }
+        if (n) pelea.referenciaDano = suma / n;
+    })();
 
     // tabla de puntuaciones: cada Pokémon contra cada objeto disponible
     const pendientes = seleccion.map(s => ({
