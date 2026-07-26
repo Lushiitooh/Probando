@@ -18,6 +18,7 @@ const CASCARA = [
   './scripts/extras.js', './scripts/progreso.js', './scripts/paneles.js',
   './scripts/combate2.js', './scripts/coleccion.js', './scripts/paneles2.js',
   './scripts/extras2.js', './scripts/paneles3.js',
+  './scripts/asesor.js', './scripts/paneles4.js',
   './scripts/PR/challengesDictionary.js', './scripts/PR/challenges.js',
   './scripts/save.js',
 ];

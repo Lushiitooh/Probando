@@ -7198,3 +7198,49 @@ body.compacto .explore-sprite { transform: scale(0.85); }
     background: rgba(255, 255, 255, 0.05); border-radius: 0.35rem; text-align: left;
 }
 .jefe-sprite { width: 5rem; image-rendering: pixelated; }
+
+/* --- barra del asesor de combate --- */
+.barra-asesor {
+    display: flex; flex-wrap: wrap; gap: 0.4rem;
+    /* margen izquierdo para no quedar debajo del botón de la pokéball */
+    padding: 0.5rem 0.6rem 0 5.5rem;
+    justify-content: center;
+}
+
+@media (max-width: 700px) {
+    .barra-asesor { padding-left: 0.6rem; padding-top: 4rem; }
+}
+
+.boton-asesor {
+    flex: 1 1 auto; min-width: 8rem;
+    padding: 0.5rem 0.8rem;
+    border: none; border-radius: 0.35rem;
+    background: rgba(255, 255, 255, 0.12); color: inherit;
+    font-family: inherit; font-size: 0.95rem; font-weight: bold;
+    cursor: pointer; transition: 0.15s;
+}
+.boton-asesor:hover { background: rgba(255, 255, 255, 0.22); }
+.boton-asesor.destacado { background: #b58bd8; color: #fff; }
+.boton-asesor.destacado:hover { background: #c9a3e6; }
+
+/* --- lista de recomendación --- */
+.lista-asesor { display: flex; flex-direction: column; gap: 0.35rem; text-align: left; }
+
+.asesor-fila {
+    display: flex; align-items: center; gap: 0.7rem;
+    padding: 0.5rem 0.6rem;
+    background: rgba(255, 255, 255, 0.05); border-radius: 0.35rem;
+}
+
+.asesor-sprite { width: 3.2rem; flex-shrink: 0; image-rendering: pixelated; }
+.asesor-datos { flex: 1; min-width: 0; }
+
+.asesor-movs { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.25rem 0; }
+
+.asesor-mov {
+    font-size: 0.78rem; padding: 0.12rem 0.4rem;
+    background: rgba(0, 0, 0, 0.3); border-radius: 0.2rem;
+    white-space: nowrap;
+}
+
+.asesor-nota { opacity: 0.75; display: block; }

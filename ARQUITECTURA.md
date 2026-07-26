@@ -703,8 +703,9 @@ el juego sigue funcionando exactamente igual que antes.
 | [progreso.js](scripts/progreso.js) | 44 logros, prestigio, 9 talentos, misiones diarias, rangos, hitos |
 | [combate2.js](scripts/combate2.js) | sinergias, combos, bendiciones, variantes de IA, análisis de rotación, simulador, clima por zona |
 | [coleccion.js](scripts/coleccion.js) | galería, Pokédex viviente, reciclaje, conjuntos, mercado, pase, ranuras, mazmorras, aliados, gráficas |
+| [asesor.js](scripts/asesor.js) | asesor de combate: analiza la pelea, elige equipo, elige **y ordena** movimientos, reparte objetos |
 | [extras2.js](scripts/extras2.js) | animaciones de impacto por tipo, modo fotografía, lore ampliado, modo historia, jefe semanal, eventos de temporada |
-| [paneles.js](scripts/paneles.js) · [paneles2.js](scripts/paneles2.js) · [paneles3.js](scripts/paneles3.js) | interfaz de todo lo anterior, dentro del tooltip que el juego ya usaba |
+| [paneles.js](scripts/paneles.js) · [paneles2.js](scripts/paneles2.js) · [paneles3.js](scripts/paneles3.js) · [paneles4.js](scripts/paneles4.js) | interfaz de todo lo anterior, dentro del tooltip que el juego ya usaba |
 | [sw.js](sw.js) · [manifest.webmanifest](manifest.webmanifest) | PWA: instalable y jugable sin conexión |
 | [tests/formulas.test.js](tests/formulas.test.js) | 28 tests de las fórmulas y de integridad de datos |
 

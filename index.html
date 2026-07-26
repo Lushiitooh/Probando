@@ -166,6 +166,21 @@
 
 
 
+        <div class="barra-asesor">
+            <button type="button" class="boton-asesor destacado" onclick="Paneles4.recomendar()"
+                    title="Analiza esta pelea y propone equipo, movimientos y objetos">
+                ⚔ Equipo recomendado
+            </button>
+            <button type="button" class="boton-asesor" onclick="Paneles4.equiparObjetos()"
+                    title="Reparte los mejores objetos entre tu equipo actual">
+                🎒 Equipar objetos
+            </button>
+            <button type="button" class="boton-asesor" onclick="Paneles4.comparar()"
+                    title="Compara tu equipo actual con lo óptimo para esta pelea">
+                📊 ¿Puedo mejorar?
+            </button>
+        </div>
+
         <div class="team-menu-selector-new">
 
 
@@ -552,6 +567,7 @@
             <div onclick="Paneles3.jefe()">Jefe de la semana</div>
             <div onclick="Paneles3.eventos()">Eventos activos</div>
             <div onclick="Paneles3.foto()">Modo fotografía</div>
+            <div onclick="Paneles4.recomendar()">Asesor de combate</div>
 
             <div 
             onclick='document.getElementById("tooltipTop").style.display = `none`
@@ -1794,6 +1810,8 @@ Guía del juego
     <script src="scripts/paneles2.js"></script>
     <script src="scripts/extras2.js"></script>
     <script src="scripts/paneles3.js"></script>
+    <script src="scripts/asesor.js"></script>
+    <script src="scripts/paneles4.js"></script>
     <script src="scripts/save.js"></script>
     <script>
     // Registro del service worker: hace el juego instalable y jugable sin
