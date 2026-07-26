@@ -171,6 +171,8 @@ function givePkmn(poke, level) {
     if (typeof Progreso !== 'undefined') probShiny *= Progreso.mult('shinyPct');
     if (typeof Combate2 !== 'undefined') probShiny *= Combate2.multBendicion('shinyPct');
     if (typeof Extras2 !== 'undefined') probShiny *= Extras2.multEvento('shinyPct');
+    if (typeof Prestigio2 !== 'undefined') probShiny *= Prestigio2.multReliquias('shinyPct') * Prestigio2.multAscension('shinyPct');
+    if (typeof Economia !== 'undefined') Economia.marcarNacimiento(poke.id);
     const saleShiny = rng(probShiny);
     if (saleShiny) poke.shiny = true;
     if (typeof Extras !== 'undefined') {
@@ -200,6 +202,8 @@ let currentTrainingWave = 0
 
 function setWildPkmn(){
 
+    if (typeof Auto !== 'undefined') Auto.autoEquipar();
+    if (typeof Combate3 !== 'undefined') Combate3.reiniciarFase();
     if (typeof Combate2 !== 'undefined') {
         Combate2.varianteActual = Combate2.sortearVariante()
         setTimeout(() => Combate2.actualizarEficacia(), 60)
@@ -1570,6 +1574,9 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (typeof Combate2 !== 'undefined') probDrop *= Combate2.multSinergia('dropPct') * Combate2.multBendicion('dropPct');
     if (typeof Coleccion !== 'undefined') probDrop *= Coleccion.multConjunto('dropPct');
     if (typeof Extras2 !== 'undefined') probDrop *= Extras2.multEvento('dropPct');
+    if (typeof Prestigio2 !== 'undefined') probDrop *= Prestigio2.multReliquias('dropPct');
+    if (typeof Economia !== 'undefined') probDrop *= Economia.multInversion(saved.currentArea);
+    if (typeof Combate3 !== 'undefined' && Combate3.buffActivo('dropSeguro')) { probDrop = 1; Combate3.consumirBuff('dropSeguro'); }
     if (rng(probDrop) && !areas[saved.currentArea]?.trainer && saved.currentArea != areas.frontierSpiralingTower.id && saved.currentArea != areas.training.id) dropItem()
     //document.getElementById(`pkmn-movebox-wild-${exploreCombatWildTurn}-bar`).style.transition = "0s linear"
     //document.getElementById(`pkmn-movebox-wild-${exploreCombatWildTurn}-bar`).style.width = "0%";
@@ -1584,6 +1591,11 @@ for (let i = activeBars; i < hpBars.length; i++) {
         Progreso.revisarLogros(); Progreso.revisarMisiones(); Progreso.revisarHitos();
         if (typeof Coleccion !== 'undefined') { Coleccion.revisarCintas(); Coleccion.revisarLecciones(); }
         if (typeof Extras2 !== 'undefined') Extras2.revisarCapitulos();
+        if (typeof Auto !== 'undefined') { Auto.latido(); Auto.evaluarReglas(); }
+        if (typeof Prestigio2 !== 'undefined') Prestigio2.revisarReliquias();
+        if (typeof Economia !== 'undefined') { Economia.revisarEncargos(); Economia.registrarTiempoZona(3); }
+        if (typeof Combate3 !== 'undefined') { Combate3.revisarFase(); Combate3.rotarClima(); }
+        if (typeof Social !== 'undefined') Social.mostrarRetrato();
         if (typeof Combate2 !== 'undefined') { Combate2.aplicarClimaDeZona(); Combate2.actualizarEficacia(); }
     }
 
@@ -1596,6 +1608,7 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (typeof Progreso !== 'undefined') baseExpGain *= Progreso.mult('expPct')
     if (typeof Combate2 !== 'undefined') baseExpGain *= Combate2.multSinergia('expPct') * Combate2.multBendicion('expPct')
     if (typeof Extras2 !== 'undefined') baseExpGain *= Extras2.multEvento('expPct')
+    if (typeof Prestigio2 !== 'undefined') baseExpGain *= Prestigio2.multReliquias('expPct')
 
     let expGained = 0
     if ( wildLevel > (pkmn[ team[exploreActiveMember].pkmn.id ].level-10) ) { expGained = baseExpGain ;}
@@ -2433,6 +2446,8 @@ function exploreCombatPlayer() {
     if (typeof Progreso !== 'undefined') moveTimerPlayer /= Progreso.mult('velocidadPct')
     if (typeof Combate2 !== 'undefined') moveTimerPlayer /= Combate2.multBendicion('velocidadPct')
     if (typeof Coleccion !== 'undefined') moveTimerPlayer /= Coleccion.multConjunto('velocidadPct')
+    if (typeof Prestigio2 !== 'undefined') moveTimerPlayer /= Prestigio2.multReliquias('velocidadPct') * Prestigio2.multAscension('velocidadPct')
+    if (typeof Combate3 !== 'undefined' && Combate3.buffActivo('dobleVelocidad')) moveTimerPlayer /= 2
 
 
     //buff modifiers
@@ -2844,6 +2859,14 @@ function exploreCombatPlayer() {
             totalPower *= Combate2.comprobarCombo(exploreActiveMember, moveType)
         }
         if (typeof Extras2 !== 'undefined') totalPower *= Extras2.multEvento('danoPct')
+        if (typeof Combate3 !== 'undefined') {
+            totalPower *= Combate3.multActivas()
+            totalPower /= Combate3.multDefensaFase()
+        }
+        if (typeof Prestigio2 !== 'undefined') {
+            totalPower *= Prestigio2.multReliquias('danoPct')
+            totalPower *= Prestigio2.multAscension('danoPct')
+        }
         if (typeof Coleccion !== 'undefined') {
             totalPower *= Coleccion.multConjunto('danoPct')
             totalPower *= Coleccion.multMote(team[exploreActiveMember].pkmn.id)
@@ -3145,6 +3168,13 @@ function exploreCombatPlayer() {
         }
         if (typeof Extras2 !== 'undefined') {
             Extras2.impacto(moveType, typeMultiplier > 1);
+        }
+        if (typeof Economia !== 'undefined') {
+            Economia.registrar({ mov: nextMovePlayer, dano: totalPower, ef: typeMultiplier,
+                                 stab: stabBonus, cruce: cruceValido });
+        }
+        if (typeof Social !== 'undefined') {
+            Social.narrarCombate(team[exploreActiveMember].pkmn.id, nextMovePlayer, totalPower, typeMultiplier);
             Extras2.registrarDanoJefe(Extras.stats().danoTotal);
         }
 
@@ -10735,6 +10765,28 @@ document.addEventListener('DOMContentLoaded', function() {
     saved.mercadoVariable ??= true;
 
     saved.capitulosLeidos ??= {};
+    saved.auto ??= {};
+    saved.fragmentos ??= 0;
+    saved.ascensiones ??= 0;
+    saved.ascension ??= {};
+    saved.reliquias ??= {};
+    saved.desafios ??= [];
+    saved.registroRenaceres ??= [];
+    saved.encargos ??= null;
+    saved.inversiones ??= {};
+    saved.memorial ??= [];
+    saved.builds ??= [];
+    saved.marcas ??= [];
+    saved.calorZonas ??= {};
+    saved.musica ??= false;
+    saved.narracion ??= false;
+    saved.lecturaFacil ??= false;
+    saved.climaCambiante ??= false;
+    saved.inicioPartida ??= Date.now();
+
+    if (typeof Economia !== 'undefined') Economia.aplicarInteres();
+    if (typeof Social !== 'undefined') { Social.instalarAtajos(); if (saved.unaMano) Social.modoUnaMano(true); }
+    if (typeof Prestigio2 !== 'undefined') Prestigio2.revisarReliquias();
     if (typeof Extras2 !== 'undefined') {
         Extras2.aplicarLoreNuevo();
         Extras2.avisarEventos();

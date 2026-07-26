@@ -299,6 +299,30 @@ document.getElementById("settings-compacto").addEventListener("change", e => {
   aplicarAjustesVisuales()
 });
 
+//--Ajustes de la segunda tanda
+saved.musica = false
+saved.narracion = false
+saved.lecturaFacil = false
+saved.unaMano = false
+
+document.getElementById("settings-musica").addEventListener("change", e => {
+  saved.musica = e.target.value === "true"
+  if (typeof Social !== "undefined") { if (saved.musica) Social.tocarMusica(); else Social.pararMusica(); }
+});
+
+document.getElementById("settings-narracion").addEventListener("change", e => {
+  saved.narracion = e.target.value === "true"
+});
+
+document.getElementById("settings-lectura-facil").addEventListener("change", e => {
+  saved.lecturaFacil = e.target.value === "true"
+});
+
+document.getElementById("settings-una-mano").addEventListener("change", e => {
+  saved.unaMano = e.target.value === "true"
+  if (typeof Social !== "undefined") Social.modoUnaMano(saved.unaMano)
+});
+
 function changeTheme(){
 
   let theme = saved.theme
@@ -986,6 +1010,10 @@ function updateSettings(alt){
   document.getElementById("settings-daltonico").value   = saved.daltonico ? "true" : "false"
   document.getElementById("settings-animaciones").value = saved.sinAnimaciones ? "true" : "false"
   document.getElementById("settings-compacto").value    = saved.compacto ? "true" : "false"
+  document.getElementById("settings-musica").value       = saved.musica ? "true" : "false"
+  document.getElementById("settings-narracion").value    = saved.narracion ? "true" : "false"
+  document.getElementById("settings-lectura-facil").value= saved.lecturaFacil ? "true" : "false"
+  document.getElementById("settings-una-mano").value     = saved.unaMano ? "true" : "false"
 
   if (saved.hideGotPkmn == "true") {document.getElementById("settings-hide-got").value = "true"} else document.getElementById("settings-hide-got").value = "false"
   if (saved.alternateWildRotation == "true") {document.getElementById("settings-alternate-rotation").value = "true"} else document.getElementById("settings-alternate-rotation").value = "false"

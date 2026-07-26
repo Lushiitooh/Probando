@@ -7243,3 +7243,51 @@ body.compacto .explore-sprite { transform: scale(0.85); }
 }
 
 .asesor-nota { opacity: 0.75; display: block; }
+
+/* --- automatización, ascensión, análisis, social --- */
+.fila-botones { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.3rem; }
+
+/* retrato del rival */
+.retrato-rival {
+    position: absolute; right: 0.5rem; top: 0.5rem;
+    width: 5rem; image-rendering: pixelated; opacity: 0.9;
+    pointer-events: none; z-index: 3;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+
+/* modo cine: se oculta todo menos el combate */
+body.modo-cine #main-content > *:not(#content-explore),
+body.modo-cine .menu-item,
+body.modo-cine #game-version { display: none !important; }
+body.modo-cine #content-explore { height: 100vh !important; }
+
+/* transición entre zonas */
+#velo-transicion {
+    position: fixed; inset: 0; z-index: 600;
+    background: #000; opacity: 0; pointer-events: none;
+}
+#velo-transicion.activo { animation: veloFundido 0.55s ease-out; }
+
+@keyframes veloFundido {
+    0%   { opacity: 0; }
+    35%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* modo una mano: los menús bajan al alcance del pulgar */
+body.una-mano #main-content { padding-bottom: 40vh; }
+body.una-mano .menu { position: fixed; bottom: 0; top: auto !important; }
+
+/* solo para lectores de pantalla */
+.solo-lector {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* foco visible para navegación por teclado */
+button:focus-visible, select:focus-visible, input:focus-visible,
+[onclick]:focus-visible, .menu-item:focus-visible {
+    outline: 3px solid #82df60;
+    outline-offset: 2px;
+}

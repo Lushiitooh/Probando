@@ -528,6 +528,26 @@
                 <option value="true">activado</option>
             </select></div>
 
+            <div data-help="settingsMusica" style="cursor: help;">Música ambiental: <select id="settings-musica">
+                <option value="false">desactivada</option>
+                <option value="true">activada</option>
+            </select></div>
+
+            <div data-help="settingsNarracion" style="cursor: help;">Narrar el combate: <select id="settings-narracion">
+                <option value="false">desactivado</option>
+                <option value="true">activado</option>
+            </select></div>
+
+            <div data-help="settingsLecturaFacil" style="cursor: help;">Lectura fácil: <select id="settings-lectura-facil">
+                <option value="false">desactivada</option>
+                <option value="true">activada</option>
+            </select></div>
+
+            <div data-help="settingsUnaMano" style="cursor: help;">Modo una mano: <select id="settings-una-mano">
+                <option value="false">desactivado</option>
+                <option value="true">activado</option>
+            </select></div>
+
             <div onclick="Extras.pedirPermisoNotificaciones()">Activar notificaciones</div>
 
             <div data-help="settingsNewPkmn" style="cursor: help;">Ocultar Pokémon no nuevos en el resumen: <select id="settings-hide-got">
@@ -568,6 +588,29 @@
             <div onclick="Paneles3.eventos()">Eventos activos</div>
             <div onclick="Paneles3.foto()">Modo fotografía</div>
             <div onclick="Paneles4.recomendar()">Asesor de combate</div>
+            <div onclick="Paneles5.consejo()">¿Qué me conviene hacer?</div>
+            <div onclick="Paneles5.diagnostico()">Diagnóstico del equipo</div>
+            <div onclick="Paneles5.automatizacion()">Automatización</div>
+            <div onclick="Paneles5.ascension()">Ascensión</div>
+            <div onclick="Paneles5.reliquias()">Reliquias</div>
+            <div onclick="Paneles5.desafios()">Desafíos de renacer</div>
+            <div onclick="Paneles5.activas()">Habilidades activas</div>
+            <div onclick="Paneles5.puzzles()">Combates puzzle</div>
+            <div onclick="Paneles5.encargos()">Encargos</div>
+            <div onclick="Paneles5.subasta()">Subasta del día</div>
+            <div onclick="Paneles5.inversiones()">Inversión en zonas</div>
+            <div onclick="Paneles5.builds()">Builds guardadas</div>
+            <div onclick="Paneles5.registroCombate()">Registro de combate</div>
+            <div onclick="Paneles5.mapaCalor()">Mapa de calor</div>
+            <div onclick="Paneles5.memorial()">Memorial</div>
+            <div onclick="Paneles5.generaciones()">Por generaciones</div>
+            <div onclick="Paneles5.intercambio()">Intercambio por código</div>
+            <div onclick="Paneles5.compartir()">Compartir equipo</div>
+            <div onclick="Paneles5.showdown()">Exportar a Showdown</div>
+            <div onclick="Paneles5.tablaReto()">Reto semanal</div>
+            <div onclick="Social.tarjeta()">Tarjeta de entrenador</div>
+            <div onclick="Economia.exportarEstadisticas()">Exportar estadísticas</div>
+            <div onclick="Social.modoCine()">Modo cine</div>
 
             <div 
             onclick='document.getElementById("tooltipTop").style.display = `none`
@@ -1812,6 +1855,12 @@ Guía del juego
     <script src="scripts/paneles3.js"></script>
     <script src="scripts/asesor.js"></script>
     <script src="scripts/paneles4.js"></script>
+    <script src="scripts/auto.js"></script>
+    <script src="scripts/prestigio2.js"></script>
+    <script src="scripts/combate3.js"></script>
+    <script src="scripts/economia.js"></script>
+    <script src="scripts/social.js"></script>
+    <script src="scripts/paneles5.js"></script>
     <script src="scripts/save.js"></script>
     <script>
     // Registro del service worker: hace el juego instalable y jugable sin
