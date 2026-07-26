@@ -105,6 +105,26 @@ API.analizarPelea = function (idArea) {
         }
     }
 
+    // Frontier: 71 zonas que no traen equipo fijo (se genera al entrar), pero
+    // sí declaran el tipo del especialista. Sin esto se quedaban sin consejo,
+    // y son casi una cuarta parte de las peleas del juego. Se modela con los
+    // mejores representantes de ese tipo, que es justo lo que planta el rival.
+    let porEspecialidad = false;
+    if (!enemigos.length && a.typing) {
+        const delTipo = [];
+        for (const id in pkmn) {
+            const e = pkmn[id];
+            if (!e || !e.type || !e.type.includes(a.typing) || !e.bst) continue;
+            delTipo.push(e);
+        }
+        delTipo.sort((x, y) => {
+            const s = o => o.bst.hp + o.bst.atk + o.bst.def + o.bst.satk + o.bst.sdef + o.bst.spe;
+            return s(y) - s(x);
+        });
+        for (const e of delTipo.slice(0, 6)) enemigos.push(e);
+        porEspecialidad = enemigos.length > 0;
+    }
+
     // tipos presentes y su peso
     const tipos = {};
     for (const e of enemigos) for (const t of (e.type || [])) tipos[t] = (tipos[t] || 0) + 1;
@@ -120,7 +140,12 @@ API.analizarPelea = function (idArea) {
     // atacar de su propio tipo.
     const ataquePorTipo = {};
     let totalDps = 0;
-    if (movsConocidos) {
+    if (porEspecialidad) {
+        // un especialista pega sobre todo de su tipo, pero no solo de él
+        ataquePorTipo[a.typing] = 0.7;
+        totalDps = 0.7;
+        for (const t in tipos) if (t !== a.typing) { ataquePorTipo[t] = tipos[t] * 0.3; totalDps += tipos[t] * 0.3; }
+    } else if (movsConocidos) {
         for (const mv of ataques) {
             const dps = mv.power * (2000 / (mv.timer || 2000)) * (mv.firma ? 1.5 : 1);
             ataquePorTipo[mv.type] = (ataquePorTipo[mv.type] || 0) + dps;
@@ -145,6 +170,7 @@ API.analizarPelea = function (idArea) {
         // --- perfil ofensivo del rival ---
         ataques,                  // movimientos con daño que usará
         movsConocidos,            // false => ataquePorTipo es una estimación por tipos
+        porEspecialidad,          // true => frontier: equipo deducido del tipo del especialista
         ataquePorTipo,            // {tipo: fracción del daño rival, suma 1}
         fisicoRival: ataques.length
             ? ataques.filter(m => m.split === 'physical').length / ataques.length : 0.5,
