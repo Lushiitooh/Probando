@@ -7144,3 +7144,57 @@ body.compacto .explore-sprite { transform: scale(0.85); }
 
 /* la caja de movimiento necesita ser contenedor para la marca de eficacia */
 .pkmn-movebox { position: relative; }
+
+/* --- impactos por tipo --- */
+.impacto-destello {
+    position: fixed; z-index: 350; pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-impacto) 0%, transparent 70%);
+    animation: destelloImpacto 0.45s ease-out forwards;
+    mix-blend-mode: screen;
+}
+
+@keyframes destelloImpacto {
+    0%   { opacity: 0; transform: scale(0.4); }
+    30%  { opacity: 0.85; transform: scale(1.15); }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+.impacto-particula {
+    position: fixed; z-index: 351; pointer-events: none;
+    font-size: 1.3rem; line-height: 1;
+    animation: particulaImpacto 0.8s ease-out forwards;
+}
+
+@keyframes particulaImpacto {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    20%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1); }
+}
+
+/* --- historia --- */
+.capitulo-texto {
+    text-align: left; line-height: 1.65; padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.04); border-radius: 0.35rem;
+    margin-bottom: 0.8rem; font-size: 1.05rem;
+}
+
+.indice-capitulos { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+.cap-boton {
+    flex: 1 1 46%; padding: 0.45rem 0.6rem;
+    border: none; border-radius: 0.3rem;
+    background: rgba(255, 255, 255, 0.08); color: inherit;
+    font-family: inherit; font-size: 0.9rem; cursor: pointer; text-align: left;
+}
+
+.cap-boton.activo    { background: rgba(130, 223, 96, 0.28); font-weight: bold; }
+.cap-boton.bloqueado { opacity: 0.4; cursor: not-allowed; }
+
+/* --- jefe semanal --- */
+.jefe-ficha {
+    display: flex; align-items: center; gap: 0.9rem;
+    padding: 0.7rem; margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.05); border-radius: 0.35rem; text-align: left;
+}
+.jefe-sprite { width: 5rem; image-rendering: pixelated; }

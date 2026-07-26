@@ -170,6 +170,7 @@ function givePkmn(poke, level) {
     let probShiny = saved.gamemodShiny == true ? 1/40 : 1/400;
     if (typeof Progreso !== 'undefined') probShiny *= Progreso.mult('shinyPct');
     if (typeof Combate2 !== 'undefined') probShiny *= Combate2.multBendicion('shinyPct');
+    if (typeof Extras2 !== 'undefined') probShiny *= Extras2.multEvento('shinyPct');
     const saleShiny = rng(probShiny);
     if (saleShiny) poke.shiny = true;
     if (typeof Extras !== 'undefined') {
@@ -1568,6 +1569,7 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (typeof Progreso !== 'undefined') probDrop *= Progreso.mult('dropPct');
     if (typeof Combate2 !== 'undefined') probDrop *= Combate2.multSinergia('dropPct') * Combate2.multBendicion('dropPct');
     if (typeof Coleccion !== 'undefined') probDrop *= Coleccion.multConjunto('dropPct');
+    if (typeof Extras2 !== 'undefined') probDrop *= Extras2.multEvento('dropPct');
     if (rng(probDrop) && !areas[saved.currentArea]?.trainer && saved.currentArea != areas.frontierSpiralingTower.id && saved.currentArea != areas.training.id) dropItem()
     //document.getElementById(`pkmn-movebox-wild-${exploreCombatWildTurn}-bar`).style.transition = "0s linear"
     //document.getElementById(`pkmn-movebox-wild-${exploreCombatWildTurn}-bar`).style.width = "0%";
@@ -1581,6 +1583,7 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (typeof Progreso !== 'undefined' && Extras.stats().combatesGanados % 3 === 0) {
         Progreso.revisarLogros(); Progreso.revisarMisiones(); Progreso.revisarHitos();
         if (typeof Coleccion !== 'undefined') { Coleccion.revisarCintas(); Coleccion.revisarLecciones(); }
+        if (typeof Extras2 !== 'undefined') Extras2.revisarCapitulos();
         if (typeof Combate2 !== 'undefined') { Combate2.aplicarClimaDeZona(); Combate2.actualizarEficacia(); }
     }
 
@@ -1592,6 +1595,7 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (saved.gamemodExp == true) baseExpGain *= 3
     if (typeof Progreso !== 'undefined') baseExpGain *= Progreso.mult('expPct')
     if (typeof Combate2 !== 'undefined') baseExpGain *= Combate2.multSinergia('expPct') * Combate2.multBendicion('expPct')
+    if (typeof Extras2 !== 'undefined') baseExpGain *= Extras2.multEvento('expPct')
 
     let expGained = 0
     if ( wildLevel > (pkmn[ team[exploreActiveMember].pkmn.id ].level-10) ) { expGained = baseExpGain ;}
@@ -2154,12 +2158,16 @@ function returnItemLevel(id, mod) {
 
 function shouldCombatStop(){
 
-    if (document.getElementById(`tooltipBackground`).style.display === "flex") return true
-    if (document.getElementById(`pkmn-editor`).style.display === "flex") return true
+    // Se llama dos veces por paso de lógica: a x10 son 1200 consultas por
+    // segundo. La caché de Extras evita repetir el getElementById.
+    const buscar = (typeof Extras !== 'undefined') ? Extras.el : (id => document.getElementById(id))
+
+    if (buscar(`tooltipBackground`).style.display === "flex") return true
+    if (buscar(`pkmn-editor`).style.display === "flex") return true
     //if (document.getElementById(`team-menu`).style.display === "flex") return true
     //if (document.getElementById(`item-menu`).style.display === "flex") return true
     //if (document.getElementById(`pokedex-menu`).style.display === "flex") return true
-    if (document.getElementById(`team-menu`).style.display === "flex") return true
+    if (buscar(`team-menu`).style.display === "flex") return true
     if (wildLevel===0) return true
     if (wildPkmnHp<0) return true
     if (saved.currentArea === undefined) return true
@@ -2835,6 +2843,7 @@ function exploreCombatPlayer() {
             totalPower *= Combate2.multBendicion('danoPct')
             totalPower *= Combate2.comprobarCombo(exploreActiveMember, moveType)
         }
+        if (typeof Extras2 !== 'undefined') totalPower *= Extras2.multEvento('danoPct')
         if (typeof Coleccion !== 'undefined') {
             totalPower *= Coleccion.multConjunto('danoPct')
             totalPower *= Coleccion.multMote(team[exploreActiveMember].pkmn.id)
@@ -3133,6 +3142,10 @@ function exploreCombatPlayer() {
                 { color: typeMultiplier > 1 ? '#ff8a5c' : (typeMultiplier < 1 ? '#9ecbff' : '#ffffff'),
                   grande: typeMultiplier > 1 });
             Extras.sonar(typeMultiplier > 1 ? 'golpeFuerte' : 'golpe');
+        }
+        if (typeof Extras2 !== 'undefined') {
+            Extras2.impacto(moveType, typeMultiplier > 1);
+            Extras2.registrarDanoJefe(Extras.stats().danoTotal);
         }
 
 
@@ -7984,32 +7997,32 @@ function formatBuffs(buff,mod) {
 
     if (mod==undefined){
     if (buff==="embargo") return `EMB`
-    if (buff==="burn") return `BRN`
-    if (buff==="freeze") return `FRZ`
+    if (buff==="burn") return `QUE`
+    if (buff==="freeze") return `CON`
     if (buff==="paralysis") return `PAR`
-    if (buff==="poisoned") return `PSN`
+    if (buff==="poisoned") return `ENV`
     if (buff==="sleep") return `ZZZ`
     if (buff==="confused") return `CNF`
-    if (buff==="atkup1") return `ATK ▲`
-    if (buff==="atkup2") return `ATK ▲▲`
-    if (buff==="atkdown1") return `ATK ▼`
-    if (buff==="atkdown2") return `ATK ▼▼`
+    if (buff==="atkup1") return `ATQ ▲`
+    if (buff==="atkup2") return `ATQ ▲▲`
+    if (buff==="atkdown1") return `ATQ ▼`
+    if (buff==="atkdown2") return `ATQ ▼▼`
     if (buff==="defup1") return `DEF ▲`
     if (buff==="defup2") return `DEF ▲▲`
     if (buff==="defdown1") return `DEF ▼`
     if (buff==="defdown2") return `DEF ▼▼`
-    if (buff==="satkup1") return `SATK ▲`
-    if (buff==="satkup2") return `SATK ▲▲`
-    if (buff==="satkdown1") return `SATK ▼`
-    if (buff==="satkdown2") return `SATK ▼▼`
-    if (buff==="sdefup1") return `SDEF ▲`
-    if (buff==="sdefup2") return `SDEF ▲▲`
-    if (buff==="sdefdown1") return `SDEF ▼`
-    if (buff==="sdefdown2") return `SDEF ▼▼`
-    if (buff==="speup1") return `SPE ▲`
-    if (buff==="speup2") return `SPE ▲▲`
-    if (buff==="spedown1") return `SPE ▼`
-    if (buff==="spedown2") return `SPE ▼▼`   
+    if (buff==="satkup1") return `ATQE ▲`
+    if (buff==="satkup2") return `ATQE ▲▲`
+    if (buff==="satkdown1") return `ATQE ▼`
+    if (buff==="satkdown2") return `ATQE ▼▼`
+    if (buff==="sdefup1") return `DEFE ▲`
+    if (buff==="sdefup2") return `DEFE ▲▲`
+    if (buff==="sdefdown1") return `DEFE ▼`
+    if (buff==="sdefdown2") return `DEFE ▼▼`
+    if (buff==="speup1") return `VEL ▲`
+    if (buff==="speup2") return `VEL ▲▲`
+    if (buff==="spedown1") return `VEL ▼`
+    if (buff==="spedown2") return `VEL ▼▼`   
     }
 
 }
@@ -10721,6 +10734,12 @@ document.addEventListener('DOMContentLoaded', function() {
     saved.climaDinamico ??= true;
     saved.mercadoVariable ??= true;
 
+    saved.capitulosLeidos ??= {};
+    if (typeof Extras2 !== 'undefined') {
+        Extras2.aplicarLoreNuevo();
+        Extras2.avisarEventos();
+        Extras2.revisarCapitulos();
+    }
     if (typeof Coleccion !== 'undefined') {
         Coleccion.registrarCintasNuevas();
         Coleccion.aplicarTemaPropio();

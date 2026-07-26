@@ -165,6 +165,8 @@ const EFECTOS = {
                         setTimeout(() => tono({ frec: f, dur: 0.14, tipo: 'triangle', gan: 0.15 }), i * 100)); },
     derrota:    () => tono({ frec: 300, dur: 0.4, tipo: 'sawtooth', gan: 0.14, barrido: -220 }),
     boton:      () => tono({ frec: 600, dur: 0.03, tipo: 'sine', gan: 0.06 }),
+    foto:       () => { tono({ frec: 1400, dur: 0.04, tipo: 'square', gan: 0.1 });
+                        setTimeout(() => tono({ frec: 900, dur: 0.06, tipo: 'square', gan: 0.08 }), 50); },
 };
 
 API.sonar = function (nombre) {
@@ -172,6 +174,29 @@ API.sonar = function (nombre) {
     const fx = EFECTOS[nombre];
     if (fx) { try { fx(); } catch (e) {} }
 };
+
+
+/* ======================================================================
+   CACHÉ DE ELEMENTOS
+   ======================================================================
+   A x10 el bucle hace cientos de getElementById por segundo. Cachear es
+   seguro porque se comprueba `isConnected`: si el juego reconstruyó ese
+   trozo de DOM con innerHTML, el nodo guardado queda desconectado y se
+   vuelve a buscar.
+   ====================================================================== */
+
+const cacheEl = new Map();
+
+API.el = function (id) {
+    const guardado = cacheEl.get(id);
+    if (guardado && guardado.isConnected) return guardado;
+    const nuevo = document.getElementById(id);
+    if (nuevo) cacheEl.set(id, nuevo); else cacheEl.delete(id);
+    return nuevo;
+};
+
+API.limpiarCacheEl = function () { cacheEl.clear(); };
+API.tamanoCacheEl = function () { return cacheEl.size; };
 
 
 /* ======================================================================
