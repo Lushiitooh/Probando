@@ -7200,15 +7200,14 @@ body.compacto .explore-sprite { transform: scale(0.85); }
 .jefe-sprite { width: 5rem; image-rendering: pixelated; }
 
 /* --- barra del asesor de combate --- */
+/* Va FUERA de .team-menu-header a propósito: ese contenedor tiene altura
+   fija de 7rem y justify-content:end, así que una fila de más empujaba
+   "Volver" y "Guardar y salir" fuera de la vista. */
 .barra-asesor {
     display: flex; flex-wrap: wrap; gap: 0.4rem;
-    /* margen izquierdo para no quedar debajo del botón de la pokéball */
-    padding: 0.5rem 0.6rem 0 5.5rem;
+    padding: 0.5rem 0.6rem;
     justify-content: center;
-}
-
-@media (max-width: 700px) {
-    .barra-asesor { padding-left: 0.6rem; padding-top: 4rem; }
+    flex-shrink: 0;
 }
 
 .boton-asesor {
