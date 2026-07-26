@@ -293,6 +293,61 @@ comprobarQue('puntuarObjeto no reintroduce un cajón de sastre sobre power()',
              !/return\s*\(\s*pot\s*-\s*1\s*\)\s*\*\s*\d+\s*;\s*\n?\s*\};/.test(fuenteAsesor));
 
 
+/* ------------------------- 10. UN EJEMPLAR DE CADA OBJETO POR EQUIPO
+   `got` NO son copias equipables: es el contador que sube el NIVEL del
+   objeto (explore.js:2134-2141). La pantalla de equipo excluye cualquier
+   objeto ya puesto en otro hueco (explore.js:6903-6908).
+
+   Usar `got` como existencias reabre el fallo que se estaba arreglando:
+   con 5 Vidasferas acumuladas el asesor se la cuelga a cinco miembros, y
+   encima deja un equipo que la interfaz no permite montar a mano.        */
+
+const bloqueLibre = fuenteAsesor.slice(fuenteAsesor.indexOf('const libre ='),
+                                       fuenteAsesor.indexOf('const libre =') + 220);
+
+comprobarQue('el reparto no usa `got` como existencias'
+             + (/\.got/.test(bloqueLibre) ? ' — vuelve a leer got en `libre`' : ''),
+             bloqueLibre.length > 0 && !/\.got/.test(bloqueLibre));
+
+
+/* ----------------------- 11. EL RIVAL NO INVENTA MOVIMIENTOS DE FIRMA
+   areas[].team.slotN es el objeto de ESPECIE del diccionario, así que su
+   .signature es el movimiento firma de la especie, no algo que el
+   entrenador use. El combate saca sus movimientos solo de slotNMoves
+   (explore.js:508-513) y areasDictionary.js no declara ni una firma.
+   Leerla metía un ataque fantasma que desviaba el perfil del rival y
+   hacía recomendar la baya equivocada.                                  */
+
+comprobarQue('analizarPelea no inyecta movimientos de firma inexistentes',
+             !/const\s+firma\s*=\s*e\s*&&\s*e\.signature/.test(fuenteAsesor));
+
+comprobarQue('areasDictionary sigue sin declarar firmas (si cambia, revisar el asesor)',
+             !/signature/.test(leer('scripts/areasDictionary.js')));
+
+
+/* -------------------- 12. EL RESPALDO DE PELEA TRAE TODOS LOS CAMPOS
+   Si el objeto de respaldo de equiparObjetosDelEquipo no trae
+   ataquePorTipo, la rama de bayas lanza TypeError y tumba el reparto
+   entero. Pasa al salir de una zona, cuando currentArea queda undefined. */
+
+const bloqueRespaldo = fuenteAsesor.slice(fuenteAsesor.indexOf('API.equiparObjetosDelEquipo'),
+                                          fuenteAsesor.indexOf('API.equiparObjetosDelEquipo') + 900);
+const faltan = ['ataquePorTipo', 'movsConocidos', 'nivel', 'defMedia', 'sdefMedia']
+    .filter(c => !bloqueRespaldo.includes(c + ':'));
+
+comprobarQue('el respaldo de pelea trae los campos que puntuarObjeto consulta'
+             + (faltan.length ? ' — faltan: ' + faltan.join(', ') : ''),
+             faltan.length === 0);
+
+
+/* ------------------ 13. EQUIPAR OBJETOS NO BORRA LO QUE YA SE LLEVA
+   `item = s.item || undefined` borraba en silencio la megapiedra de un
+   Pokémon al que el reparto no le asignaba nada.                        */
+
+comprobarQue('equiparObjetosDelEquipo no borra el objeto cuando no hay asignación',
+             !/\.item\s*=\s*s\.item\s*\|\|\s*undefined/.test(fuenteAsesor));
+
+
 /* --------------------------------------------------------------- informe */
 
 console.log('');

@@ -85,13 +85,13 @@ API.analizarPelea = function (idArea) {
                     }
                 }
             }
-            // movimiento de firma (117 rivales tienen uno y suele ser el que mata)
-            const firma = e && e.signature;
-            if (firma && firma.power > 0) {
-                ataques.push({ id: firma.id || 'firma', type: firma.type, power: firma.power,
-                               split: firma.split, timer: firma.timer || 2000, firma: true });
-                movsConocidos = true;
-            }
+            // OJO: NO se lee e.signature. `a.team.slotN` es el objeto de especie
+            // del diccionario, así que .signature sería el movimiento firma de la
+            // ESPECIE, que el entrenador nunca ejecuta: el combate saca sus
+            // movimientos solo de slotNMoves (explore.js:508-513) y
+            // areasDictionary.js no declara ni una firma. Inyectarla metía un
+            // ataque fantasma que desviaba el perfil y hacía recomendar la baya
+            // equivocada.
         }
     }
     // salvajes
@@ -147,7 +147,7 @@ API.analizarPelea = function (idArea) {
         for (const t in tipos) if (t !== a.typing) { ataquePorTipo[t] = tipos[t] * 0.3; totalDps += tipos[t] * 0.3; }
     } else if (movsConocidos) {
         for (const mv of ataques) {
-            const dps = mv.power * (2000 / (mv.timer || 2000)) * (mv.firma ? 1.5 : 1);
+            const dps = mv.power * (2000 / (mv.timer || 2000));
             ataquePorTipo[mv.type] = (ataquePorTipo[mv.type] || 0) + dps;
             totalDps += dps;
         }
@@ -292,7 +292,21 @@ API.mejoresMovimientos = function (idPkmn, pelea) {
 
     const conDano = rankeados.filter(r => r.d > 0).slice(0, 8).map(r => r.id);
     if (conDano.length <= 1) {
-        const movs = conDano.concat(rankeados.filter(r => r.d === 0).slice(0, 3).map(r => r.id)).slice(0, 4);
+        // Los huecos se rellenan con movimientos sin daño, pero el juego
+        // ABORTA el combate si un Pokémon lleva más de un movimiento
+        // restringido (teams.js:344-349), y los 27 restringidos son
+        // justamente de potencia 0. Se admite como mucho uno.
+        const relleno = [];
+        let restringidos = conDano.filter(id => move[id] && move[id].restricted).length;
+        for (const r of rankeados) {
+            if (r.d !== 0 || relleno.length >= 3) continue;
+            if (move[r.id] && move[r.id].restricted) {
+                if (restringidos >= 1) continue;
+                restringidos++;
+            }
+            relleno.push(r.id);
+        }
+        const movs = conDano.concat(relleno).slice(0, 4);
         return { movs, valor: valorSecuencia(p, movs, pelea), nota: 'repertorio muy corto' };
     }
 
@@ -540,12 +554,17 @@ API.puntuarObjeto = function (idItem, idPkmn, movs, pelea) {
     if (idItem === 'ejectButton' || idItem === 'ejectPack')
         return Math.max(0, (pot - 1) * 100 - 30);
 
-    // Orbes de estado: multiplican, pero se autoinfligen quemadura o veneno,
-    // y la quemadura divide el daño físico por 1.5 (explore.js:2699). A nivel
-    // bajo el balance es NEGATIVO: 1.15/1.5 = x0.77.
+    // Orbes de estado: multiplican siempre, pero se autoinfligen un estado que
+    // hace daño por turno (explore.js:3195-3196). Ese daño es vida máxima/50,
+    // salvo en zonas de entrenador, donde es /12: igual que la Vidasfera.
+    // Además SOLO la quemadura divide el daño físico por 1.5 (explore.js:2699);
+    // el Orbe Tóxico envenena, así que no le corresponde ese castigo.
     if (idItem === 'flameOrb' || idItem === 'toxicOrb') {
-        const fracFisica = fraccionDano(p, movs, pelea, mv => mv.split === 'physical');
-        return (pot / (1 + 0.5 * fracFisica) - 1) * 100;
+        const residual = 100 / (pelea.esEntrenador ? 12 : 50);
+        let mult = pot;
+        if (idItem === 'flameOrb')
+            mult = pot / (1 + 0.5 * fraccionDano(p, movs, pelea, mv => mv.split === 'physical'));
+        return (mult - 1) * 100 - residual * 4.5 * def;
     }
 
     // Cintas de elección: solo su categoría, y bloquean el relevo.
@@ -647,8 +666,14 @@ API.repartirObjetos = function (seleccion, pelea) {
     // perdería si no se lleva su mejor objeto, no a quien más gana. Con
     // copias limitadas eso importa: si dos quieren la única Vidasfera, se
     // la queda aquel cuya segunda opción es peor.
-    const libre = op => (usados[op.id] || 0) < item[op.id].got
-                     && !(zUsado && item[op.id].zType);
+    // UN ejemplar de cada objeto por equipo. `got` NO son copias equipables:
+    // es el contador que sube el NIVEL del objeto (>=5 nivel 2, >=20 nivel 5,
+    // explore.js:2134-2141), y entra en la puntuación por potenciaObjeto(),
+    // nunca como existencias. La pantalla de equipo excluye cualquier objeto
+    // ya puesto en otro hueco (explore.js:6903-6908), así que usar `got` como
+    // stock reabría el fallo original: con 5 Vidasferas acumuladas se la
+    // colgaba a cinco miembros, y encima el equipo no se podía montar a mano.
+    const libre = op => !usados[op.id] && !(zUsado && item[op.id].zType);
 
     while (pendientes.length) {
         let elegido = null, mejorArrepentimiento = -Infinity;
@@ -763,8 +788,15 @@ API.aplicar = function (rec) {
    ====================================================================== */
 
 API.equiparObjetosDelEquipo = function () {
+    // El respaldo tiene que traer TODOS los campos que puntuarObjeto consulta.
+    // Si falta ataquePorTipo, la rama de bayas lanza TypeError y tumba el
+    // reparto entero: pasa al salir de una zona, cuando currentArea queda
+    // undefined y se pulsa "Equipar objetos".
     const pelea = API.analizarPelea(saved.currentAreaBuffer || saved.currentArea)
-               || { enemigos: [], defMedia: 3, sdefMedia: 3, campo: null };
+               || { enemigos: [], defMedia: 3, sdefMedia: 3, campo: null, nivel: 50,
+                    tipos: {}, tiposOrdenados: [], ataques: [], ataquePorTipo: {},
+                    movsConocidos: false, porEspecialidad: false, esEntrenador: false,
+                    idArea: undefined, fisicoRival: 0.5 };
 
     const destino = saved.previewTeams[saved.currentPreviewTeam];
     const seleccion = [];
@@ -777,10 +809,15 @@ API.equiparObjetosDelEquipo = function () {
 
     API.repartirObjetos(seleccion, pelea);
 
+    // Solo se escribe cuando hay asignación. Antes se hacía
+    // `item = s.item || undefined`, y eso BORRABA en silencio el objeto que ya
+    // llevaba el Pokémon cuando el reparto no le daba ninguno (por ejemplo un
+    // megaevolucionado con su megapiedra puesta pero sin movimientos todavía).
     let cambiados = 0;
     for (const s of seleccion) {
-        if (s.item && destino[s.slotKey].item !== s.item) cambiados++;
-        destino[s.slotKey].item = s.item || undefined;
+        if (!s.item) continue;
+        if (destino[s.slotKey].item !== s.item) cambiados++;
+        destino[s.slotKey].item = s.item;
     }
     if (typeof updatePreviewTeam === 'function') updatePreviewTeam();
     if (typeof Extras !== 'undefined') Extras.sonar('objeto');
