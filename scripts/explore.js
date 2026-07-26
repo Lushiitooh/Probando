@@ -3603,7 +3603,7 @@ function returnTypeMultipliers(pkmn) {
 
 
                  let superEffective = false
-                 if (typeEffectiveness(move[nextMove].type, pkmn[team[exploreActiveMember].pkmn.id].type) == 1.5) superEffective = true
+                 if (typeEffectiveness(move[nextMove].type, pkmn[team[exploreActiveMember].pkmn.id].type) > 1) superEffective = true
 
                  //stab
                  if (pkmn[saved.currentPkmn].type.includes(move[nextMove].type)) totalPower *=1.5
@@ -3619,8 +3619,8 @@ function returnTypeMultipliers(pkmn) {
                 if (team[exploreActiveMember].item == item.yacheBerry.id && move[nextMove].type == 'ice' && superEffective) {totalPower /= (item.yacheBerry.power() /100) +1}
                 if (team[exploreActiveMember].item == item.chopleBerry.id && move[nextMove].type == 'fighting' && superEffective) {totalPower /= (item.chopleBerry.power() /100) +1}
                 if (team[exploreActiveMember].item == item.kebiaBerry.id && move[nextMove].type == 'poison' && superEffective) {totalPower /= (item.kebiaBerry.power() /100) +1}
-                if (team[exploreActiveMember].item == item.shucaBerry.id && move[nextMove].type == 'ground' && superEffective) {totalPower /= (item.cobaBerry.power() /100) +1}
-                if (team[exploreActiveMember].item == item.cobaBerry.id && move[nextMove].type == 'flying' && superEffective) {totalPower /= (item.occaBerry.power() /100) +1}
+                if (team[exploreActiveMember].item == item.shucaBerry.id && move[nextMove].type == 'ground' && superEffective) {totalPower /= (item.shucaBerry.power() /100) +1}
+                if (team[exploreActiveMember].item == item.cobaBerry.id && move[nextMove].type == 'flying' && superEffective) {totalPower /= (item.cobaBerry.power() /100) +1}
                 if (team[exploreActiveMember].item == item.payapaBerry.id && move[nextMove].type == 'psychic' && superEffective) {totalPower /= (item.payapaBerry.power() /100) +1}
                 if (team[exploreActiveMember].item == item.tangaBerry.id && move[nextMove].type == 'bug' && superEffective) {totalPower /= (item.tangaBerry.power() /100) +1}
                 if (team[exploreActiveMember].item == item.chartiBerry.id && move[nextMove].type == 'rock' && superEffective) {totalPower /= (item.chartiBerry.power() /100) +1}

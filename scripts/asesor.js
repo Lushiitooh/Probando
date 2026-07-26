@@ -59,6 +59,12 @@ API.analizarPelea = function (idArea) {
     if (!a) return null;
 
     const enemigos = [];
+    // Movimientos REALES del rival. Las 138 zonas con entrenador los declaran
+    // en team.slotNMoves, y el jefe además trae uno de firma en slotN.signature.
+    // Antes se descartaban, y sin ellos no se puede recomendar contra nadie
+    // en concreto: una baya de agua es oro contra Blastoise y basura contra Onix.
+    const ataques = [];
+    let movsConocidos = false;
 
     // equipo de entrenador
     if (a.team) {
@@ -67,6 +73,25 @@ API.analizarPelea = function (idArea) {
             const e = a.team[k];
             const id = e && (e.id || e);
             if (id && pkmn[id]) enemigos.push(pkmn[id]);
+
+            // los cuatro movimientos declarados de ese hueco
+            const lista = a.team[k + 'Moves'];
+            if (Array.isArray(lista)) {
+                for (const m of lista) {
+                    const mv = move[m];
+                    if (mv && mv.power > 0) {
+                        ataques.push({ id: m, type: mv.type, power: mv.power, split: mv.split, timer: mv.timer || 2000 });
+                        movsConocidos = true;
+                    }
+                }
+            }
+            // movimiento de firma (117 rivales tienen uno y suele ser el que mata)
+            const firma = e && e.signature;
+            if (firma && firma.power > 0) {
+                ataques.push({ id: firma.id || 'firma', type: firma.type, power: firma.power,
+                               split: firma.split, timer: firma.timer || 2000, firma: true });
+                movsConocidos = true;
+            }
         }
     }
     // salvajes
@@ -89,6 +114,23 @@ API.analizarPelea = function (idArea) {
     for (const e of enemigos) { def += e.bst.def; sdef += e.bst.sdef; }
     const n = Math.max(1, enemigos.length);
 
+    // Reparto del ataque rival por tipo, ponderado por daño por segundo real.
+    // Si no se conocen los movimientos (zonas salvajes), se cae de vuelta a los
+    // tipos del rival, que es la mejor conjetura disponible: un Pokémon suele
+    // atacar de su propio tipo.
+    const ataquePorTipo = {};
+    let totalDps = 0;
+    if (movsConocidos) {
+        for (const mv of ataques) {
+            const dps = mv.power * (2000 / (mv.timer || 2000)) * (mv.firma ? 1.5 : 1);
+            ataquePorTipo[mv.type] = (ataquePorTipo[mv.type] || 0) + dps;
+            totalDps += dps;
+        }
+    } else {
+        for (const t in tipos) { ataquePorTipo[t] = tipos[t]; totalDps += tipos[t]; }
+    }
+    for (const t in ataquePorTipo) ataquePorTipo[t] /= (totalDps || 1);
+
     return {
         idArea,
         nombre: a.name || nom(idArea),
@@ -100,8 +142,31 @@ API.analizarPelea = function (idArea) {
         defMedia: def / n,
         sdefMedia: sdef / n,
         campo: a.fieldEffect || null,
+        // --- perfil ofensivo del rival ---
+        ataques,                  // movimientos con daño que usará
+        movsConocidos,            // false => ataquePorTipo es una estimación por tipos
+        ataquePorTipo,            // {tipo: fracción del daño rival, suma 1}
+        fisicoRival: ataques.length
+            ? ataques.filter(m => m.split === 'physical').length / ataques.length : 0.5,
     };
 };
+
+
+/* ======================================================================
+   1b. AMENAZA REAL CONTRA UN POKÉMON CONCRETO
+   ======================================================================
+   Antes se estimaba el peligro con los TIPOS del rival, no con sus ataques.
+   Blastoise es de agua, así que una planta parecía segura... hasta que le
+   cae el Rayo Hielo. Con los movimientos declarados esto ya no pasa.
+   ====================================================================== */
+
+/** Multiplicador de daño recibido esperado, ponderado por lo que de verdad usa el rival. */
+function amenazaContra(p, pelea) {
+    let m = 0;
+    for (const t in pelea.ataquePorTipo) m += pelea.ataquePorTipo[t] * eficacia(t, p.type);
+    return m || 1;
+}
+API.amenazaContra = amenazaContra;
 
 
 /* ======================================================================
@@ -240,12 +305,10 @@ API.puntuar = function (idPkmn, pelea) {
     const mejores = API.mejoresMovimientos(idPkmn, pelea);
     if (!mejores) return null;
 
-    // cuánto le pegan a él: se penaliza ser débil a los tipos del rival
-    let recibido = 0, n = 0;
-    for (const e of pelea.enemigos) {
-        for (const t of (e.type || [])) { recibido += eficacia(t, p.type); n++; }
-    }
-    const vulnerabilidad = n ? recibido / n : 1;
+    // Cuánto le pegan a él, según los ataques que el rival usa DE VERDAD
+    // (no según los tipos del rival, que engañan: Blastoise es de agua pero
+    // lleva Rayo Hielo y Trueno).
+    const vulnerabilidad = amenazaContra(p, pelea);
 
     const aguante = (p.bst.hp * 30 * Math.pow(1.1, (p.ivs && p.ivs.hp) || 0)
                    + p.bst.def * 15 + p.bst.sdef * 15) * (1 + (p.level || 1) * 0.2);
@@ -284,62 +347,249 @@ function potenciaObjeto(id) {
     catch (e) { return 1; }
 }
 
+/* ----------------------------------------------------------------------
+   power() NO SIGNIFICA LO MISMO EN CADA FAMILIA.
+   Este fue el fallo de raíz: había un cajón de sastre `(power-1)*25` que
+   trataba todo como si fuese un multiplicador de daño. No lo es:
+
+     charcoal      power() = 1.4  -> multiplicador de daño     -> valía 40
+     passhoBerry   power() = 40   -> PORCENTAJE de reducción   -> valía 975
+     firiumZ       power() = 18   -> TURNOS DE CARGA (¡coste!) -> valía 425
+     fireGem       power() = 1.1  -> multiplicador + STAB      -> valía 2,5
+     luckyEgg      power() = 50   -> porcentaje de experiencia -> valía 1225
+
+   Por eso el asesor colgaba una baya a los seis: 975 gana a 40 siempre.
+   Y con los cristales Z era aún peor, porque premiaba al que MÁS tarda
+   en cargar. Ahora cada familia se convierte a la misma unidad honesta:
+   "% de mejora esperada en el resultado de ESTA pelea".
+   ---------------------------------------------------------------------- */
+
+// Baya -> tipo del que reduce el daño. Sacado de explore.js:3933-3949,
+// no del subtitle, que está traducido y cambiaría con el idioma.
+const BAYA_POR_TIPO = {
+    occaBerry: 'fire', passhoBerry: 'water', wacanBerry: 'electric', rindoBerry: 'grass',
+    yacheBerry: 'ice', chopleBerry: 'fighting', kebiaBerry: 'poison', shucaBerry: 'ground',
+    cobaBerry: 'flying', payapaBerry: 'psychic', tangaBerry: 'bug', chartiBerry: 'rock',
+    kasibBerry: 'ghost', habanBerry: 'dragon', colburBerry: 'dark', babiriBerry: 'steel',
+    roseliBerry: 'fairy',
+};
+
+/** Cuánto pega cada movimiento, para repartir el mérito por daño y no por conteo. */
+function pesosDeDano(p, movs, pelea) {
+    const pesos = movs.map(m => (move[m] && move[m].power > 0) ? danoMovimiento(p, m, pelea) : 0);
+    const total = pesos.reduce((a, b) => a + b, 0);
+    return { pesos, total };
+}
+
+/** Fracción del daño total que aportan los movimientos que cumplen `filtro`. */
+function fraccionDano(p, movs, pelea, filtro) {
+    const { pesos, total } = pesosDeDano(p, movs, pelea);
+    if (!total) return 0;
+    let parte = 0;
+    movs.forEach((m, i) => { if (move[m] && filtro(move[m])) parte += pesos[i]; });
+    return parte / total;
+}
+
+/**
+ * Cuánto conviene defenderse en esta pelea, de 0 a 1.
+ * En un juego idle lo que manda es matar rápido, pero si el rival te tumba
+ * pierdes mucho más. Se mide el riesgo real: cuánto pega el rival comparado
+ * con lo que aguanta este Pokémon.
+ */
+function pesoDefensivo(p, pelea) {
+    const aguante = (p.bst.hp * 30 * Math.pow(1.1, (p.ivs && p.ivs.hp) || 0)
+                   + p.bst.def * 15 + p.bst.sdef * 15) * (1 + (p.level || 1) * 0.2);
+    const golpe = (pelea.nivel || 50) * 30 * amenazaContra(p, pelea);
+    const riesgo = golpe / Math.max(1, aguante);          // >1 = te hacen polvo
+    return Math.max(0.15, Math.min(1, riesgo));
+}
+
 /** Puntúa un objeto para un Pokémon con unos movimientos dados. */
 API.puntuarObjeto = function (idItem, idPkmn, movs, pelea) {
     const it = item[idItem];
-    if (!it || it.type !== 'held' || !(it.got > 0)) return 0;
+    if (!it || !(it.got > 0)) return 0;
     const p = pkmn[idPkmn];
-    if (!p) return 0;
+    if (!p || !movs || !movs.length) return 0;
 
-    const pot = potenciaObjeto(idItem);
+    // Las megapiedras son equipables pero su type NO es 'held', así que un
+    // filtro ingenuo las dejaba fuera del asesor por completo (53 objetos).
+    const esMega = typeof it.heldBonusPkmn === 'function';
+    if (it.type !== 'held' && !esMega) return 0;
 
-    // impulsores de tipo: valen según qué parte del daño es de ese tipo
+    const pot     = potenciaObjeto(idItem);
+    const conDano = movs.filter(m => move[m] && move[m].power > 0);
+    const def     = pesoDefensivo(p, pelea);
+
+    /* --- 0. MEGAPIEDRA (explore.js:2852) ---------------------------------
+       Multiplicador incondicional, pero solo si el portador es exactamente
+       esa megaevolución. Para cualquier otro no hace absolutamente nada. */
+    if (esMega) {
+        let destinatario = null;
+        try { destinatario = it.heldBonusPkmn(); } catch (e) {}
+        const idDest = destinatario && (destinatario.id || destinatario);
+        if (!idDest || idDest !== idPkmn) return 0;
+        let mult = 1;
+        try { mult = it.heldBonusPower ? it.heldBonusPower() : 1; } catch (e) {}
+        return (mult - 1) * 100;
+    }
+
+    /* --- 1. IMPULSOR DE TIPO (explore.js:2809) ---------------------------
+       totalPower *= power() solo si el movimiento es de ese tipo.        */
     for (const tipo in OBJETO_POR_TIPO) {
         if (OBJETO_POR_TIPO[tipo] !== idItem) continue;
-        const conDano = movs.filter(m => move[m] && move[m].power > 0);
-        const deEseTipo = conDano.filter(m => move[m].type === tipo).length;
-        if (!deEseTipo) return 0;
-        // fracción del daño que se beneficia × cuánto sube = % efectivo
-        return (pot - 1) * (deEseTipo / Math.max(1, conDano.length)) * 100;
+        const frac = fraccionDano(p, movs, pelea, mv => mv.type === tipo);
+        return frac > 0 ? (pot - 1) * frac * 100 : 0;
     }
 
-    // Todo se puntúa en la MISMA unidad: porcentaje de daño efectivo extra.
-    // Sin esa normalización, un objeto de utilidad con valor plano alto
-    // ganaba siempre y el asesor repartía el mismo objeto a los seis.
+    /* --- 2. GEMA DE TIPO (explore.js:2745 y 2846) ------------------------
+       Doble efecto: power() a TODO el daño sin condición, y además STAB
+       prestado (x1.5, o x1.7 si es de un solo tipo) a los movimientos de
+       su tipo cuando el Pokémon no lo tiene ya. Lo segundo es lo gordo y
+       antes valía 2,5 puntos.                                            */
+    if (/Gem$/.test(idItem) && !it.zType) {
+        const tipoGema = idItem.replace(/Gem$/, '');
+        let v = (pot - 1) * 100;
+        if (!p.type.includes(tipoGema)) {
+            const stab = p.type.length === 1 ? 1.7 : 1.5;
+            v += (stab - 1) * fraccionDano(p, movs, pelea, mv => mv.type === tipoGema) * 100;
+        }
+        return v;
+    }
 
-    // Vidasfera: sube todo el daño
-    if (idItem === 'lifeOrb') return (pot - 1) * 100;
+    /* --- 3. CRISTAL Z (explore.js:2956-3051) -----------------------------
+       power() son TURNOS DE CARGA y va A LA BAJA: 18 con una copia, 10 con
+       muchas. Menor es mejor, justo al revés que todo lo demás. Al dispararse
+       lanza un golpe de potencia base 30 multiplicada por 8 (explore.js:3022).
+       Funciona desde cualquier ranura, pero solo se admite uno por equipo. */
+    if (it.zType) {
+        const turnos = Math.max(1, pot);
+        const datos  = pesosDeDano(p, movs, pelea);
+        const medio  = datos.total / Math.max(1, conDano.length);
+        if (!medio) return 0;
+        const fisico = p.bst.atk >= p.bst.satk;
+        const atk    = fisico ? p.bst.atk : p.bst.satk;
+        const iv     = (p.ivs && (fisico ? p.ivs.atk : p.ivs.satk)) || 0;
+        const defR   = fisico ? pelea.defMedia : pelea.sdefMedia;
+        let dz = (30 + Math.max(0, atk * 30 * Math.pow(1.1, iv) - defR * 30))
+                 * (1 + (p.level || 1) * 0.1) * 8;
+        if (p.type.includes(it.zType)) dz *= 1.5;
+        let ef = 0;
+        for (const e of pelea.enemigos) ef += eficacia(it.zType, e.type);
+        dz *= pelea.enemigos.length ? ef / pelea.enemigos.length : 1;
+        // el golpe extra se reparte entre los turnos que cuesta cargarlo
+        return Math.max(0, dz / turnos / medio * 100);
+    }
 
-    // Cintas de elección: solo benefician a su categoría, así que se puntúan
-    // en proporción, igual que los objetos de tipo. Además impiden relevar,
-    // y eso se descuenta.
-    const conDanoTotal = movs.filter(m => move[m] && move[m].power > 0);
-    const PENALIZACION_SIN_RELEVO = 8;
+    /* --- 4. BAYA DE RESISTENCIA (explore.js:3933) ------------------------
+       totalPower /= (power()/100 + 1). Con power 40 son -28,6%, y SOLO si
+       el ataque entrante es de ese tipo Y supereficaz. Aquí es donde el
+       asesor mira al rival de verdad: una Baya Pasio es oro contra
+       Blastoise y no vale nada contra un Onix.                           */
+    if (BAYA_POR_TIPO[idItem]) {
+        const tipo  = BAYA_POR_TIPO[idItem];
+        const cuota = pelea.ataquePorTipo[tipo] || 0;
+        if (!cuota) return 0;
+        if (eficacia(tipo, p.type) <= 1) return 0;
+        const reduccion = 1 - 1 / (pot / 100 + 1);
+        return cuota * reduccion * 100 * def * (pelea.movsConocidos ? 1 : 0.5);
+    }
+
+    /* --- 5. MULTIPLICADORES DE DAÑO ------------------------------------- */
+
+    // Vidasfera: +power() a todo, pero cuesta vida máxima/12 por golpe
+    // (explore.js:3204). Sin descontar el retroceso ganaba a cualquier cosa
+    // y se la llevaban los seis. Duele en proporción al peligro que corres.
+    if (idItem === 'lifeOrb') {
+        const RETROCESO = 100 / 12;
+        return (pot - 1) * 100 - RETROCESO * 4.5 * def;
+    }
+
+    // Arcilla Luz y Malicia: pese a sonar defensivos, el código los usa como
+    // multiplicador INCONDICIONAL del daño (explore.js:2828-2829).
+    if (idItem === 'lightClay' || idItem === 'weaknessPolicy') return (pot - 1) * 100;
+
+    // Botones de expulsión: multiplican siempre, pero fuerzan relevo tras
+    // cada movimiento (explore.js:3285), y eso rompe la cadena de Potencia
+    // Cruzada, que es el motor de daño de este juego.
+    if (idItem === 'ejectButton' || idItem === 'ejectPack')
+        return Math.max(0, (pot - 1) * 100 - 30);
+
+    // Orbes de estado: multiplican, pero se autoinfligen quemadura o veneno,
+    // y la quemadura divide el daño físico por 1.5 (explore.js:2699). A nivel
+    // bajo el balance es NEGATIVO: 1.15/1.5 = x0.77.
+    if (idItem === 'flameOrb' || idItem === 'toxicOrb') {
+        const fracFisica = fraccionDano(p, movs, pelea, mv => mv.split === 'physical');
+        return (pot / (1 + 0.5 * fracFisica) - 1) * 100;
+    }
+
+    // Cintas de elección: solo su categoría, y bloquean el relevo.
     if (idItem === 'choiceBand' || idItem === 'choiceSpecs') {
         const categoria = idItem === 'choiceBand' ? 'physical' : 'special';
-        const encajan = conDanoTotal.filter(m => move[m].split === categoria).length;
-        if (!encajan) return 0;
-        const bruto = (pot - 1) * (encajan / Math.max(1, conDanoTotal.length)) * 100;
-        return Math.max(0, bruto - PENALIZACION_SIN_RELEVO);
+        const frac = fraccionDano(p, movs, pelea, mv => mv.split === categoria);
+        if (!frac) return 0;
+        return Math.max(0, (pot - 1) * frac * 100 - 8);
     }
 
-    // Mineral Evolutivo: defensa, y solo si de verdad puede evolucionar
+    /* --- 6. VELOCIDAD DE ATAQUE (divisores del temporizador) -------------
+       moveTimer /= power() equivale a multiplicar el DPS por power().    */
+    if (idItem === 'quickClaw') {
+        const frac = fraccionDano(p, movs, pelea,
+                                  m => m.affectedBy && m.affectedBy.includes('libero'));
+        return frac > 0 ? (pot - 1) * frac * 100 : 0;
+    }
+    if (idItem === 'powerHerb') {
+        // solo acelera movimientos de estado (potencia 0), que no hacen daño
+        const deEstado = movs.filter(m => move[m] && move[m].power === 0).length;
+        return deEstado ? (pot - 1) * (deEstado / movs.length) * 40 : 0;
+    }
+
+    /* --- 7. MULTIPLICADORES POR ETIQUETA DEL MOVIMIENTO ------------------
+       Dependen de move.affectedBy, no de la habilidad del Pokémon.       */
+    const POR_ETIQUETA = {
+        loadedDice:  m => m.affectedBy && m.affectedBy.includes('skillLink'),
+        luckyPunch:  m => m.affectedBy && m.affectedBy.includes('ironFist'),
+        laggingTail: m => m.affectedBy && m.affectedBy.includes('reckless'),
+        metronome:   m => m.buildup !== undefined,
+    };
+    if (POR_ETIQUETA[idItem]) {
+        const frac = fraccionDano(p, movs, pelea, POR_ETIQUETA[idItem]);
+        return frac > 0 ? (pot - 1) * frac * 100 : 0;
+    }
+
+    /* --- 8. DIVISORES DEL DAÑO RECIBIDO (explore.js:3951-3957) -----------
+       totalPower /= power(): un power de 1.4 son -28,6% de daño recibido,
+       no -40%. Se escalan por el riesgo real de esta pelea.              */
     if (idItem === 'eviolite') {
-        let evoluciona = false;
-        try { evoluciona = !!(p.evolve && p.evolve()[1] && p.evolve()[1].pkmn); } catch (e) {}
-        return evoluciona ? (pot - 1) * 55 : 0;
+        let vale = false;
+        try {
+            const evo = p.evolve && p.evolve()[1] && p.evolve()[1].pkmn;
+            const idEvo = evo && (evo.id || evo);
+            vale = !!idEvo && (String(idEvo).slice(0, 4) !== 'mega' || idPkmn === 'bayleef');
+        } catch (e) {}
+        return vale ? (1 - 1 / Math.max(1, pot)) * 100 * def : 0;
     }
+    if (idItem === 'assaultVest') {
+        // convierte los movimientos de estado en Splash: solo si todo pega
+        if (conDano.length !== movs.length) return 0;
+        return (1 - 1 / Math.max(1, pot)) * 100 * def;
+    }
+    if (idItem === 'mentalHerb' || idItem === 'heavyDutyBoots')
+        return (1 - 1 / Math.max(1, pot)) * 100 * def;
 
-    // Utilidad y supervivencia: valen, pero menos que el daño directo.
-    // Un objeto de tipo bien elegido debe poder ganarles.
-    if (idItem === 'leftovers')      return 14;
-    if (idItem === 'assaultVest')    return movs.every(m => move[m] && move[m].power > 0) ? (pot - 1) * 40 : 0;
-    if (idItem === 'heavyDutyBoots') return (pelea.campo && pelea.campo.includes('stealthRocks')) ? 45 : 6;
-    if (idItem === 'quickClaw')      return 12;
-    if (idItem === 'luckyEgg')       return 5;
+    /* --- 9. UTILIDAD FUERA DE COMBATE ------------------------------------
+       No ayudan a GANAR esta pelea, que es lo que se pide. Además la
+       experiencia vale 0 en zonas de entrenador (explore.js:1603).       */
+    if (idItem === 'luckyEgg') return pelea.esEntrenador ? 0 : 3;
+    if (idItem === 'shinyCharm' || idItem === 'luckIncense' || idItem === 'pureIncense') return 0;
 
-    // resto de equipables
-    return (pot - 1) * 25;
+    /* --- 10. LO QUE NO ENTENDEMOS NO SE RECOMIENDA -----------------------
+       Sin cajón de sastre. Antes había un `(power-1)*25` que trataba
+       cualquier unidad como si fuese un multiplicador de daño, y por eso
+       una baya (power 40) puntuaba 975 y se la llevaban los seis. Si un
+       objeto no está clasificado arriba no sabemos qué mide su power(),
+       así que vale un valor simbólico: lo lleva quien no tenga nada mejor
+       y jamás puede ganarle a un efecto que sí conocemos.                */
+    return 0.5;
 };
 
 /**
@@ -349,26 +599,55 @@ API.puntuarObjeto = function (idItem, idPkmn, movs, pelea) {
  */
 API.repartirObjetos = function (seleccion, pelea) {
     const usados = {};
-    const candidatos = Object.keys(item).filter(k => item[k].type === 'held' && item[k].got > 0);
+    // Se incluyen las megapiedras, que son equipables aunque su type no sea
+    // 'held' (explore.js:2852). El filtro antiguo dejaba fuera 53 objetos.
+    const candidatos = Object.keys(item).filter(k =>
+        item[k].got > 0 && (item[k].type === 'held' || typeof item[k].heldBonusPkmn === 'function'));
 
-    // se atiende primero a quien más gana con su mejor objeto
-    const propuestas = seleccion.map(s => {
-        const puntuados = candidatos
+    // El juego solo admite UN cristal Z por equipo (teams.js:365-381): si se
+    // reparten dos, la pantalla de equipo da error al guardar.
+    let zUsado = false;
+
+    // tabla de puntuaciones: cada Pokémon contra cada objeto disponible
+    const pendientes = seleccion.map(s => ({
+        slot: s,
+        opciones: candidatos
             .map(k => ({ id: k, v: API.puntuarObjeto(k, s.id, s.movs, pelea) }))
             .filter(x => x.v > 0)
-            .sort((a, b) => b.v - a.v);
-        return { slot: s, opciones: puntuados };
-    }).sort((a, b) => (b.opciones[0] ? b.opciones[0].v : 0) - (a.opciones[0] ? a.opciones[0].v : 0));
+            .sort((a, b) => b.v - a.v),
+    }));
 
-    for (const p of propuestas) {
-        for (const op of p.opciones) {
-            const usadas = usados[op.id] || 0;
-            if (usadas >= item[op.id].got) continue;   // no hay más copias
-            usados[op.id] = usadas + 1;
-            p.slot.item = op.id;
-            p.slot.itemValor = op.v;
-            break;
+    // Reparto por ARREPENTIMIENTO: en cada vuelta se atiende a quien más
+    // perdería si no se lleva su mejor objeto, no a quien más gana. Con
+    // copias limitadas eso importa: si dos quieren la única Vidasfera, se
+    // la queda aquel cuya segunda opción es peor.
+    const libre = op => (usados[op.id] || 0) < item[op.id].got
+                     && !(zUsado && item[op.id].zType);
+
+    while (pendientes.length) {
+        let elegido = null, mejorArrepentimiento = -Infinity;
+
+        for (const p of pendientes) {
+            const disponibles = p.opciones.filter(libre);
+            if (!disponibles.length) { p.vacio = true; continue; }
+            const mejor = disponibles[0].v;
+            const segundo = disponibles[1] ? disponibles[1].v : 0;
+            const arrepentimiento = mejor - segundo;
+            if (arrepentimiento > mejorArrepentimiento) {
+                mejorArrepentimiento = arrepentimiento;
+                elegido = { p, op: disponibles[0] };
+            }
         }
+
+        // los que ya no tienen ninguna opción libre salen de la lista
+        for (let i = pendientes.length - 1; i >= 0; i--) if (pendientes[i].vacio) pendientes.splice(i, 1);
+        if (!elegido) break;
+
+        usados[elegido.op.id] = (usados[elegido.op.id] || 0) + 1;
+        if (item[elegido.op.id].zType) zUsado = true;
+        elegido.p.slot.item = elegido.op.id;
+        elegido.p.slot.itemValor = elegido.op.v;
+        pendientes.splice(pendientes.indexOf(elegido.p), 1);
     }
     return seleccion;
 };

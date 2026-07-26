@@ -197,6 +197,102 @@ comprobarQue('sin colisiones de id nuevas' + (nuevas.length ? ' (aparecieron: ' 
              nuevas.length === 0);
 
 
+/* ------------------------------------------------ 6. UNIDADES DE power()
+   La causa del fallo de "el asesor le pone la misma baya a los seis":
+   power() NO devuelve la misma unidad en todas las familias de objetos.
+
+       charcoal      1.4  -> multiplicador de daño
+       passhoBerry   40   -> porcentaje de reducción
+       firiumZ       18   -> turnos de carga (¡y va a la baja!)
+       luckyEgg      50   -> porcentaje de experiencia
+
+   Cualquier fórmula que trate power() como un multiplicador único vuelve a
+   romperlo. Esta guarda exige que todo objeto cuyo power() se salga del
+   rango de multiplicador esté clasificado explícitamente en asesor.js.     */
+
+const fuenteAsesor = leer('scripts/asesor.js');
+
+// ids que asesor.js trata de forma explícita, con su unidad declarada
+const CLASIFICADOS_NO_MULTIPLICADOR = [
+    'luckyEgg', 'shinyCharm', 'luckIncense', 'pureIncense',   // porcentajes fuera de combate
+    'clearAmulet',                                            // turnos planos
+    'terrainExtender', 'dampRock', 'heatRock', 'icyRock',     // turnos de clima
+    'smoothRock', 'electricSeed', 'grassySeed', 'mistySeed', 'foggySeed',
+];
+
+const sinClasificar = [];
+for (const k in item) {
+    const it = item[k];
+    if (it.type !== 'held') continue;
+    let pot;
+    try { pot = typeof it.power === 'function' ? it.power() : 1; } catch (e) { continue; }
+    if (typeof pot !== 'number' || pot <= 3) continue;   // rango de multiplicador, sin riesgo
+
+    const esBaya    = fuenteAsesor.includes(k + ':');            // está en BAYA_POR_TIPO
+    const esZ       = !!it.zType;                                // cristal Z
+    const esConocido = CLASIFICADOS_NO_MULTIPLICADOR.includes(k)
+                    || fuenteAsesor.includes("'" + k + "'");
+    if (!esBaya && !esZ && !esConocido) sinClasificar.push(k + ' (power=' + pot + ')');
+}
+
+comprobarQue('todo objeto con power() fuera de rango multiplicador está clasificado en el asesor'
+             + (sinClasificar.length ? ' — sin clasificar: ' + sinClasificar.join(', ') : ''),
+             sinClasificar.length === 0);
+
+
+/* ----------------------------------------- 7. EL MAPA DE BAYAS NO SE DESVÍA
+   asesor.js lleva su propio mapa baya -> tipo del que protege. Si el combate
+   cambia y el mapa no, el asesor recomendaría la baya equivocada sin que
+   nada fallase de forma visible. Se comparan las dos fuentes.              */
+
+const fuenteExplore = leer('scripts/explore.js');
+
+// pares (baya, tipo) tal y como los aplica el combate
+const enCombate = {};
+const reBaya = /item\.(\w+Berry)\.id && move\[nextMoveWild\]\.type == '(\w+)'/g;
+let m;
+while ((m = reBaya.exec(fuenteExplore)) !== null) enCombate[m[1]] = m[2];
+
+// pares declarados en el mapa del asesor
+const bloque = fuenteAsesor.slice(fuenteAsesor.indexOf('const BAYA_POR_TIPO'));
+const enAsesor = {};
+const reMapa = /(\w+Berry):\s*'(\w+)'/g;
+while ((m = reMapa.exec(bloque.slice(0, bloque.indexOf('};')))) !== null) enAsesor[m[1]] = m[2];
+
+const desviadas = [];
+for (const b in enCombate) if (enAsesor[b] !== enCombate[b])
+    desviadas.push(b + ': combate=' + enCombate[b] + ' asesor=' + (enAsesor[b] || 'falta'));
+
+comprobarQue('el mapa baya->tipo del asesor coincide con el combate ('
+             + Object.keys(enCombate).length + ' bayas)'
+             + (desviadas.length ? ' — desviadas: ' + desviadas.join('; ') : ''),
+             Object.keys(enCombate).length >= 17 && desviadas.length === 0);
+
+
+/* ------------------------------- 8. CADA BAYA CONSULTA SU PROPIO power()
+   En la rama de entrenador había dos erratas de copia: la baya de tierra
+   leía el power() de la de volador y la de volador el de la de fuego. Hoy
+   no se nota porque todas valen 40, pero en cuanto una suba de nivel sí.  */
+
+const erratas = [];
+const reLinea = /item\.(\w+Berry)\.id && move\[\w+\]\.type == '\w+' && superEffective\) \{totalPower \/= \(item\.(\w+Berry)\.power/g;
+while ((m = reLinea.exec(fuenteExplore)) !== null)
+    if (m[1] !== m[2]) erratas.push(m[1] + ' usa el power() de ' + m[2]);
+
+comprobarQue('cada baya divide por su propio power()'
+             + (erratas.length ? ' — ' + erratas.join('; ') : ''),
+             erratas.length === 0);
+
+
+/* ------------------------------ 9. EL ASESOR NO TIENE CAJÓN DE SASTRE
+   El fallo original era un `return (pot - 1) * 25` al final de puntuarObjeto
+   que se tragaba cualquier objeto sin clasificar tratándolo como si su
+   power() fuese un multiplicador de daño. De ahí los 975 puntos de la baya. */
+
+comprobarQue('puntuarObjeto no reintroduce un cajón de sastre sobre power()',
+             !/return\s*\(\s*pot\s*-\s*1\s*\)\s*\*\s*\d+\s*;\s*\n?\s*\};/.test(fuenteAsesor));
+
+
 /* --------------------------------------------------------------- informe */
 
 console.log('');
