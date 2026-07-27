@@ -164,9 +164,9 @@ API.panelDorado = function () {
     }
     const vida = Math.round(60000 * Math.pow(1.35, d.nivel || 0));
     abrir('El Dorado — nivel ' + ((d.nivel || 0) + 1), `
-        <p>Un blindado con una defensa que <strong>anula el daño normal</strong>.
-        En este juego la defensa se RESTA al ataque, así que con la suya casi todo
-        hace cero: solo lo atraviesan los dos tipos de abajo.</p>
+        <p>Va acorazado: cualquier movimiento que <strong>no sea de uno de sus dos
+        tipos grieta hace solo el 15 %</strong> del daño. Traer la rotación correcta
+        no es un consejo, es la única forma de tumbarlo.</p>
         <p><strong>Grietas:</strong> ${(d.grietas || []).map(nom).join(' y ') || '—'}<br>
         <strong>Vida:</strong> ${vida.toLocaleString('es')}<br>
         <strong>Ventana:</strong> ${Modos.Dorado.VENTANA} acciones antes de que huya<br>
@@ -385,6 +385,79 @@ API.panelLinaje = function () {
            Hacen falta ${Progreso2.Caramelos.POR_CARAMELO.toLocaleString('es')} de experiencia por caramelo.</p>`;
 
     abrir('Linaje', html);
+};
+
+API.panelMundo = function () {
+    if (typeof Mundo === 'undefined') return;
+    const P = Mundo.Pactos, C = Mundo.Cebos, B = Mundo.Brotes, Ba = Mundo.Banco;
+
+    let html = `<h3>Pactos de zona</h3>
+        <p>Penalizaciones que eliges TÚ. Cada punto de dureza da un
+        <strong>+25 %</strong> de botín y experiencia.</p>
+        <p>Dureza actual: <strong>${P.dureza()}</strong> ·
+        recompensa <strong>x${P.multRecompensa().toFixed(2)}</strong>
+        ${P.estado().mejorDureza ? ' · récord ' + P.estado().mejorDureza : ''}</p>
+        <div class="lista-nodos">` +
+        P.LISTA.map(x => `<div class="nodo-exp${P.activo(x.k)?' nodo-activo':''}"
+            onclick="Mundo.Pactos.alternar('${x.k}'); PanelesModos.panelMundo();">
+            <strong>${x.nombre}</strong> <small>+${x.dureza}</small><br><small>${x.desc}</small></div>`).join('')
+        + `</div>
+        <div class="fila-botones"><button onclick="Mundo.Pactos.limpiar(); PanelesModos.panelMundo();">Quitar todos</button></div>`;
+
+    html += `<h3>Banco de tiempo</h3>
+        <p>El tiempo que pasas fuera ya no se gasta solo donde te dejaste:
+        se guarda y lo sueltas donde te convenga.</p>
+        <p>Guardado: <strong>${Ba.horas().toFixed(1)} h</strong> ·
+        gastado en total: ${(Ba.estado().gastado/3600).toFixed(1)} h</p>
+        ${Ba.estado().guardado > 0
+            ? `<div class="fila-botones">
+                 <button onclick="Mundo.Banco.gastar(3600); PanelesModos.panelMundo();">Soltar 1 hora aquí</button>
+                 <button onclick="Mundo.Banco.gastar(); PanelesModos.panelMundo();">Soltarlo todo aquí</button></div>`
+            : '<p style="opacity:0.7">No hay tiempo guardado todavía.</p>'}`;
+
+    const inv = C.estado().inventario;
+    html += `<h3>Cebos</h3>`;
+    if (C.estado().activo) {
+        const t = C.TIPOS.find(x => x.k === C.estado().activo);
+        html += `<p>Activo: <strong>${t ? t.nombre : C.estado().activo}</strong> ·
+                 quedan <strong>${C.estado().restantes}</strong> encuentros</p>`;
+    }
+    html += '<div class="lista-nodos">' + C.TIPOS.map(t => `
+        <div class="nodo-exp" onclick="Mundo.Cebos.usar('${t.k}'); PanelesModos.panelMundo();">
+            <strong>${t.nombre}</strong> <small>x${inv[t.k]||0}</small><br>
+            <small>${t.desc}</small><br><small>Dura ${t.usos} encuentros</small>
+        </div>`).join('') + '</div>';
+
+    B.generar();
+    html += `<h3>Brotes de hoy</h3>`;
+    const lista = B.estado().lista || [];
+    html += lista.length
+        ? '<div class="lista-caza">' + lista.map(x => `
+            <div class="fila-caza">
+                <img src="img/pkmn/sprite/${x.especie}.png" alt="">
+                <span><strong>${nom(x.especie)}</strong>${pkmn[x.especie] && !pkmn[x.especie].caught ? ' <em style="color:#82df60">te falta</em>' : ''}<br>
+                <small>${nom(x.zona)} · ${Math.round(B.probabilidad(x.zona)*100)} % de aparición
+                (${B.estado().derrotados[x.zona]||0} derrotas: sube al 75 % a las 30 y al 90 % a las 60)</small></span>
+            </div>`).join('') + '</div>'
+        : '<p>No hay brotes hoy.</p>';
+
+    abrir('Mundo', html);
+};
+
+API.panelEstilos = function () {
+    if (typeof Estilos === 'undefined') return;
+    let html = `<p>Cada uno de los 4 huecos de la rotación puede llevar un estilo distinto.
+        Se cambia pulsando la insignia de la esquina de cada movimiento en el menú de equipo.</p>
+        <p><strong>Los básicos</strong> se desbloquean con ${Estilos.UMBRAL} usos de ese movimiento;
+        <strong>los avanzados</strong> con ${Estilos.UMBRAL_AVANZADO}. El contador sube también con el AFK.</p>`;
+    html += '<div class="lista-nodos">' + Estilos.ORDEN.map(k => {
+        const t = Estilos.TABLA[k];
+        return `<div class="nodo-exp"><strong>${t.icono} ${t.nombre}</strong>
+                ${t.avanzado ? ' <small>avanzado</small>' : ''}<br><small>${t.desc || 'Sin cambios'}</small></div>`;
+    }).join('') + '</div>';
+    const c = Estilos.consejoZona();
+    if (c) html += `<p><strong>${c}</strong></p>`;
+    abrir('Estilos de rotación', html);
 };
 
 

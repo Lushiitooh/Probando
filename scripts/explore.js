@@ -537,6 +537,18 @@ for (let i = 0; i < 4; i++) {
 
     if (areas[saved.currentArea].spawns.common == undefined) spawnedPkmn = arrayPick(areas[saved.currentArea].spawns.rare).id
 
+    // Brote del día: una especie inunda la tabla de esta zona.
+    // Cebos: sesgan qué rareza sale y con qué nivel.
+    if (typeof Mundo !== 'undefined') { try {
+        const _br = Mundo.Brotes.enZona(saved.currentArea)
+        if (_br && pkmn[_br.especie] && rng(Mundo.Brotes.probabilidad(saved.currentArea))) spawnedPkmn = _br.especie
+        const _sp = areas[saved.currentArea].spawns
+        if (Mundo.Cebos.hay('dulce')  && _sp && _sp.uncommon && rng(0.24)) spawnedPkmn = arrayPick(_sp.uncommon).id
+        if (Mundo.Cebos.hay('amargo') && _sp && _sp.rare     && rng(0.10)) spawnedPkmn = arrayPick(_sp.rare).id
+        if (Mundo.Cebos.hay('denso')) wildLevel += 10
+        Mundo.Cebos.consumir()
+    } catch(e) {} }
+
     // Profundidad de zona: quedarse la va endureciendo por tramos de 25 KO.
     // Aura: una especie muy derrotada empieza a aparecer mejorada.
     // Ambas suben el nivel, que es lo que multiplica el daño y la experiencia.
@@ -1573,6 +1585,7 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (typeof Modos !== 'undefined') { try { Modos.alDerrotarSalvaje() } catch(e) { console.error('Modos', e) } }
     // nivel de búsqueda por especie y profundidad de zona
     if (typeof Progreso2 !== 'undefined') { try { Progreso2.alDerrotarSalvaje(saved.currentPkmn) } catch(e) { console.error('Progreso2', e) } }
+    if (typeof Mundo !== 'undefined') { try { Mundo.Tera.reiniciar(); Mundo.Brotes.sumar(saved.currentArea) } catch(e) {} }
 
 
 
@@ -1655,6 +1668,7 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (typeof Extras2 !== 'undefined') baseExpGain *= Extras2.multEvento('expPct')
     if (typeof Prestigio2 !== 'undefined') baseExpGain *= Prestigio2.multReliquias('expPct')
     if (typeof Progreso2 !== 'undefined') baseExpGain *= Progreso2.Profundidad.multExp()
+    if (typeof Mundo !== 'undefined') baseExpGain *= Mundo.Pactos.multRecompensa()
 
     let expGained = 0
     if ( wildLevel > (pkmn[ team[exploreActiveMember].pkmn.id ].level-10) ) { expGained = baseExpGain ;}
@@ -2697,7 +2711,17 @@ function exploreCombatPlayer() {
             // escala y aparece un punto de cruce real hacia 3 estrellas.
             let _es = { dano: 1, defensa: 1 }
             if (typeof Estilos !== 'undefined') { try {
-                _es = Estilos.mods(attacker.id, team[exploreActiveMember].turn, nextMove.id)
+                _es = Estilos.mods(attacker.id, team[exploreActiveMember].turn, nextMove.id, moveType)
+            } catch(e) {} }
+            // innatas del atacante: dos pasivas por especie que cambian las
+            // reglas de la rotación (primer golpe, remate, agonía, veterano...)
+            if (typeof Mundo !== 'undefined') { try {
+                _es.dano *= Mundo.Innatas.multDano(attacker.id, {
+                    turno: team[exploreActiveMember].turn,
+                    cruza: (typeof lastCrossStab !== 'undefined' && lastCrossStab !== undefined && lastCrossStab !== moveType),
+                    vidaRival: (wildPkmnHpMax ? wildPkmnHp / wildPkmnHpMax : 1),
+                    entrenador: !!areas[saved.currentArea]?.trainer,
+                })
             } catch(e) {} }
 
             totalPower = 
@@ -2794,6 +2818,12 @@ function exploreCombatPlayer() {
 
 
         let moveType = nextMove.type
+        // Teracristalización: al bajar el rival del 50 % todos tus movimientos
+        // pasan al teratipo oculto del portador y la pelea se recalcula
+        if (typeof Mundo !== 'undefined') { try {
+            if (Mundo.Tera.revisar() || Mundo.Tera.estado().activo)
+                moveType = Mundo.Tera.tipoEfectivo(attacker.id, moveType)
+        } catch(e) {} }
         if (testAbility(`active`, ability.normalize.id) && moveType!=="normal") {moveType = "normal"; totalPower*=1.3}
 
         if (testAbility(`active`, ability.ferrilate.id) && moveType=="normal") {moveType = "steel"; totalPower*=1.3}
@@ -2855,6 +2885,10 @@ function exploreCombatPlayer() {
 
 
         let crossPowerBonus = 1.3
+        // el estilo Cadena sube la Potencia Cruzada de x1,3 a x1,75
+        if (typeof Estilos !== 'undefined') { try {
+            crossPowerBonus += Estilos.multCruce(attacker.id, team[exploreActiveMember].turn, nextMove.id)
+        } catch(e) {} }
         if (typeof Progreso !== 'undefined') crossPowerBonus += Progreso.bonus('crucePlano')
         crossPowerBonus += (BONUS_CADENA[longitudCadena()] || 0)
         if (typeof Combate2 !== 'undefined') {
@@ -4190,6 +4224,7 @@ function initialiseArea(){
 
 
     zCrystalTurn = 0
+    if (typeof Estilos !== 'undefined') { try { Estilos.reiniciarCombate() } catch(e) {} }
     for (const i in pkmn) if (pkmn[i].battling) pkmn[i].battling=undefined
 
     for (const slot in team) {
@@ -10785,6 +10820,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof Modos !== 'undefined') { try { Modos.init() } catch(e) { console.error('Modos/init', e) } }
     if (typeof Progreso2 !== 'undefined') { try { Progreso2.init() } catch(e) { console.error('Progreso2/init', e) } }
     if (typeof Estilos !== 'undefined') { try { Estilos.init() } catch(e) { console.error('Estilos/init', e) } }
+    if (typeof Mundo !== 'undefined') { try { Mundo.init() } catch(e) { console.error('Mundo/init', e) } }
 
 
     if (saved.shopApricornMemoryRotationWhite == undefined) {

@@ -7335,3 +7335,24 @@ button:focus-visible, select:focus-visible, input:focus-visible,
 }
 .nodo-premio img { width: 2rem; image-rendering: pixelated; }
 .nodo-premio em { color: #82df60; font-style: normal; }
+
+/* insignia de estilo de rotación en las cajas de movimiento */
+.insignia-estilo {
+    position: absolute; right: 0.2rem; top: 0.15rem;
+    min-width: 1.1rem; height: 1.1rem; line-height: 1.1rem;
+    text-align: center; border-radius: 0.3rem;
+    font-size: 0.85rem; font-weight: bold; cursor: pointer;
+    background: rgba(0,0,0,0.55); color: #fff;
+    border: 1px solid rgba(255,255,255,0.35); z-index: 5;
+}
+.insignia-estilo:hover { border-color: #82df60; transform: scale(1.15); }
+.insignia-estilo.bloqueada { opacity: 0.3; cursor: default; }
+.insignia-estilo.bloqueada:hover { border-color: rgba(255,255,255,0.35); transform: none; }
+.insignia-estilo.estilo-N { display: none; }
+.insignia-estilo.estilo-A { background: #2d7fd3; }
+.insignia-estilo.estilo-F { background: #c0522d; }
+.insignia-estilo.estilo-P { background: #b8860b; }
+.insignia-estilo.estilo-C { background: #7a3fa8; }
+.insignia-estilo.estilo-T { background: #2e8b57; }
+.pkmn-movebox { position: relative; }
+.nodo-exp.nodo-activo { border-color: #82df60; background: rgba(130,223,96,0.22); }

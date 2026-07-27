@@ -194,6 +194,11 @@ function updatePreviewTeam(){
                     divMove.dataset.tipoCorto = (ES.tipo[move[moveId].type] || move[moveId].type).slice(0, 3).toUpperCase()
                 }
     document.getElementById(`explore-team-member-${i}-moves-preview`).appendChild(divMove)
+    // insignia de estilo de rotación, clicable para cambiarlo
+    if (typeof Estilos !== 'undefined') { try {
+        const _n = parseInt(String(e).replace('slot',''), 10)
+        Estilos.pintarInsignia(divMove, currentTeam[i].pkmn.id, _n, moveId)
+    } catch(err) {} }
     }
 
     }

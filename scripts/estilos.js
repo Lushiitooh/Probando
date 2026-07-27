@@ -32,15 +32,34 @@ var Estilos = (function () {
 const API = {};
 
 const TABLA = {
-    N: { tiempo: 1.00, dano: 1.00, defensa: 1.00, nombre: 'Normal', icono: '=' },
-    A: { tiempo: 0.65, dano: 0.72, defensa: 1.00, nombre: 'Ágil',   icono: '»' },
-    F: { tiempo: 1.60, dano: 1.40, defensa: 0.50, nombre: 'Fuerte', icono: '¶' },
+    // Los tres básicos: el eje velocidad/fuerza.
+    N: { tiempo: 1.00, dano: 1.00, defensa: 1.00, nombre: 'Normal',  icono: '=', desc: 'Sin cambios' },
+    A: { tiempo: 0.65, dano: 0.72, defensa: 1.00, nombre: 'Ágil',    icono: '»', desc: 'Rápido y flojo. Gana contra defensa 1-2★' },
+    F: { tiempo: 1.60, dano: 1.40, defensa: 0.50, nombre: 'Fuerte',  icono: '¶', desc: 'Lento y duro, atraviesa defensa. Gana de 3★ en adelante' },
+
+    // Los tres avanzados: cada uno se paga con algo distinto. Piden 600 usos.
+    // Preciso cambia daño fijo por daño variable: mismo promedio, mucha varianza.
+    P: { tiempo: 1.00, dano: 1.00, defensa: 1.00, nombre: 'Preciso', icono: '×', avanzado: true,
+         critProb: 0.30, critMult: 2.2, critFallo: 0.55,
+         desc: '30 % de golpe crítico x2,2, pero el resto pega flojo. Casi el mismo promedio con mucha más varianza' },
+
+    // Cadena renuncia a fuerza bruta para reforzar la Potencia Cruzada, que
+    // es el motor real del juego: premia rotaciones de cuatro tipos distintos.
+    C: { tiempo: 1.00, dano: 0.85, defensa: 1.00, nombre: 'Cadena',  icono: '∞', avanzado: true,
+         cruceExtra: 0.45, desc: '-15 % de fuerza, pero la Potencia Cruzada sube de x1,3 a x1,75' },
+
+    // Torrente sube solo si repites tipo: es el estilo ANTI-cruce, para
+    // equipos monotipo que hoy no tienen nada que los premie.
+    T: { tiempo: 0.90, dano: 0.80, defensa: 1.00, nombre: 'Torrente', icono: '↑', avanzado: true,
+         acumula: 0.22, tope: 5, desc: 'Empieza flojo pero +22 % acumulable si repites el mismo tipo' },
 };
 API.TABLA = TABLA;
 
 // usos del movimiento necesarios para poder cambiarle el estilo
-const UMBRAL = 200;
+const UMBRAL = 200;            // básicos
+const UMBRAL_AVANZADO = 600;   // Preciso, Cadena y Torrente
 API.UMBRAL = UMBRAL;
+API.UMBRAL_AVANZADO = UMBRAL_AVANZADO;
 
 API.init = function () {
     if (!saved.estilos) saved.estilos = {};
@@ -55,8 +74,11 @@ API.usos = function (idMov) {
     return Math.max(a, b);
 };
 
-API.desbloqueado = function (idMov) {
-    return !!(idMov && move[idMov] && move[idMov].power > 0 && API.usos(idMov) >= UMBRAL);
+API.desbloqueado = function (idMov, letra) {
+    if (!idMov || !move[idMov] || !(move[idMov].power > 0)) return false;
+    const u = API.usos(idMov);
+    if (letra && TABLA[letra] && TABLA[letra].avanzado) return u >= UMBRAL_AVANZADO;
+    return u >= UMBRAL;
 };
 
 /** Respaldo por si Progreso2 no estuviera cargado. Se capa para no crecer. */
@@ -82,7 +104,7 @@ API.leer = function (idEspecie, hueco) {
 API.efectivo = function (idEspecie, hueco, idMov) {
     const c = API.leer(idEspecie, hueco);
     if (c === 'N') return 'N';
-    return API.desbloqueado(idMov) ? c : 'N';
+    return API.desbloqueado(idMov, c) ? c : 'N';
 };
 
 API.escribir = function (idEspecie, hueco, letra) {
@@ -93,13 +115,20 @@ API.escribir = function (idEspecie, hueco, letra) {
 };
 
 /** Normal -> Ágil -> Fuerte -> Normal */
+API.ORDEN = ['N', 'A', 'F', 'P', 'C', 'T'];
+
 API.ciclar = function (idEspecie, hueco, idMov) {
     if (!API.desbloqueado(idMov)) return 'N';
-    const orden = ['N', 'A', 'F'];
     const act = API.leer(idEspecie, hueco);
-    const sig = orden[(orden.indexOf(act) + 1) % orden.length];
-    API.escribir(idEspecie, hueco, sig);
-    return sig;
+    let i = API.ORDEN.indexOf(act);
+    // se salta lo que aún no esté desbloqueado, hasta dar la vuelta entera
+    for (let n = 0; n < API.ORDEN.length; n++) {
+        i = (i + 1) % API.ORDEN.length;
+        const c = API.ORDEN[i];
+        if (c === 'N' || API.desbloqueado(idMov, c)) { API.escribir(idEspecie, hueco, c); return c; }
+    }
+    API.escribir(idEspecie, hueco, 'N');
+    return 'N';
 };
 
 /**
@@ -112,16 +141,102 @@ API.multTiempo = function (idEspecie, hueco, idMov) {
     return TABLA[c].tiempo;
 };
 
-/** Multiplicadores de daño y de penetración, una vez por golpe. */
-API.mods = function (idEspecie, hueco, idMov) {
+/* --- estado vivo de los estilos avanzados, solo dentro de un combate --- */
+let racha = { tipo: null, n: 0 };   // Torrente
+API.ultimoCrit = false;             // Preciso, para que la interfaz lo pueda avisar
+
+API.reiniciarCombate = function () { racha = { tipo: null, n: 0 }; API.ultimoCrit = false; };
+
+/**
+ * Multiplicadores de daño y penetración, una vez por golpe.
+ * Aquí viven los tres estilos avanzados, que no son simples multiplicadores:
+ *   Preciso  tira un crítico
+ *   Torrente acumula si repites tipo
+ *   Cadena   refuerza la Potencia Cruzada (se aplica fuera, ver multCruce)
+ */
+API.mods = function (idEspecie, hueco, idMov, tipoMov) {
     const c = API.efectivo(idEspecie, hueco, idMov);
-    return { dano: TABLA[c].dano, defensa: TABLA[c].defensa, letra: c };
+    const t = TABLA[c];
+    let dano = t.dano;
+    API.ultimoCrit = false;
+
+    if (c === 'P') {
+        // mismo promedio que Normal (0.7 + 0.3*2.2 = 1.36... se compensa)
+        if (rng(t.critProb)) { dano *= t.critMult; API.ultimoCrit = true; }
+        else dano *= t.critFallo;
+    }
+
+    if (c === 'T') {
+        if (tipoMov && racha.tipo === tipoMov) racha.n = Math.min(t.tope, racha.n + 1);
+        else { racha.tipo = tipoMov; racha.n = 0; }
+        dano *= (1 + racha.n * t.acumula);
+    } else if (tipoMov) {
+        // cualquier otro estilo corta la racha de Torrente
+        racha.tipo = tipoMov; racha.n = 0;
+    }
+
+    return { dano: dano, defensa: t.defensa, letra: c };
 };
+
+/** Bonus extra a la Potencia Cruzada que aporta el estilo Cadena. */
+API.multCruce = function (idEspecie, hueco, idMov) {
+    const c = API.efectivo(idEspecie, hueco, idMov);
+    return TABLA[c].cruceExtra || 0;
+};
+
+/** Estado de la racha de Torrente, para enseñarlo. */
+API.rachaActual = () => ({ tipo: racha.tipo, n: racha.n });
 
 /** Texto de ayuda para la interfaz. */
 API.consejo = function (estrellasDefensaRival) {
     if (estrellasDefensaRival >= 3) return 'Este rival tiene la defensa alta: Fuerte rinde más.';
     return 'Este rival tiene la defensa baja: Ágil rinde más.';
+};
+
+
+/* ------------------------------------------------------------- interfaz */
+
+/**
+ * Pinta la insignia de estilo en una caja de movimiento del menú de equipo.
+ * Se llama justo después de crear la caja, en teams.js.
+ */
+API.pintarInsignia = function (caja, idEspecie, hueco, idMov) {
+    if (!caja || !idMov) return;
+    const desbloq = API.desbloqueado(idMov);
+    const letra = API.efectivo(idEspecie, hueco, idMov);
+    const t = TABLA[letra];
+
+    const b = document.createElement('span');
+    b.className = 'insignia-estilo' + (desbloq ? '' : ' bloqueada') + ' estilo-' + letra;
+    b.textContent = t.icono;
+    b.title = desbloq
+        ? t.nombre + ' — pulsa para cambiar (tiempo x' + t.tiempo + ', fuerza x' + t.dano +
+          (t.defensa < 1 ? ', atraviesa defensa' : '') + ')'
+        : 'Estilo bloqueado: usa este movimiento ' + API.UMBRAL + ' veces (llevas ' + API.usos(idMov) + ')';
+
+    if (desbloq) {
+        b.addEventListener('click', ev => {
+            ev.stopPropagation();
+            API.ciclar(idEspecie, hueco, idMov);
+            if (typeof updatePreviewTeam === 'function') updatePreviewTeam();
+        });
+    }
+    caja.appendChild(b);
+};
+
+/** Consejo contextual: qué estilo conviene contra la zona a la que vas a entrar. */
+API.consejoZona = function () {
+    const z = areas[saved.currentAreaBuffer || saved.currentArea];
+    if (!z) return '';
+    let def = 0, n = 0;
+    const mirar = e => { if (e && e.bst) { def += e.bst.def; n++; } };
+    if (z.spawns) for (const t in z.spawns) if (Array.isArray(z.spawns[t])) z.spawns[t].forEach(mirar);
+    if (z.team) for (const k in z.team) if (/^slot\d+$/.test(k)) mirar(z.team[k]);
+    if (!n) return '';
+    const media = def / n;
+    return media >= 3
+        ? 'Defensa media del rival: ' + media.toFixed(1) + '★ — Fuerte rinde más aquí.'
+        : 'Defensa media del rival: ' + media.toFixed(1) + '★ — Ágil rinde más aquí.';
 };
 
 return API;
