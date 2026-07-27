@@ -499,6 +499,12 @@ for (let i = 0; i < 4; i++) {
 
 
             areas[saved.currentArea].defeated = true;
+            // modos nuevos: Señor abatido, Dorado cazado o etapa superada
+            if (typeof Modos !== 'undefined') { try {
+                const _z = saved.currentArea
+                if (areas[_z] && areas[_z].senorSlot) Modos.Senores.alDerrotar(areas[_z].senorSlot)
+                if (_z === 'doradoZona') Modos.Dorado.alDerrotarlo()
+            } catch(e) { console.error('Modos', e) } }
             leaveCombat(); 
             wildPkmnHp = wildPkmnHpMax
             return
@@ -1044,6 +1050,9 @@ function leaveCombat(){
     let rarePkmnChance = 0.01
     let shinyPkmnChance = 1/400
     let shinyPkmnChanceEncounter = 1/120
+    // la cadena de Cacería multiplica la probabilidad de variocolor
+    if (typeof Modos !== 'undefined') { try { const mc = Modos.Caza.multShiny()
+        if (mc > 1) { shinyPkmnChance *= mc; shinyPkmnChanceEncounter *= mc } } catch(e) {} }
     for (const slot in team) {
 
         if (team[slot].pkmn === undefined ) continue
@@ -1123,6 +1132,7 @@ function leaveCombat(){
     divPkmn.dataset.pkmnEditor = hatchedPkmn
 
     pkmn[hatchedPkmn].caught++
+    if (typeof Modos !== 'undefined') { try { Modos.Caza.mejorarEjemplar(hatchedPkmn) } catch(e) {} }
 
     if (saved.hideGotPkmn == "true" && divTag=="") continue
 
@@ -1530,6 +1540,11 @@ for (let i = activeBars; i < hpBars.length; i++) {
 
     if (percent <= 0) { //on wild death enemy kill
 
+    // los modos nuevos se enganchan aquí: cadena de caza, piso de torre,
+    // racha de los Señores y aparición de rastros dorados
+    if (typeof Modos !== 'undefined') { try { Modos.alDerrotarSalvaje() } catch(e) { console.error('Modos', e) } }
+
+
 
     if (afkSeconds>0) afkSeconds-- //account for the lack of timer respawn
 
@@ -1592,7 +1607,7 @@ for (let i = activeBars; i < hpBars.length; i++) {
         if (typeof Coleccion !== 'undefined') { Coleccion.revisarCintas(); Coleccion.revisarLecciones(); }
         if (typeof Extras2 !== 'undefined') Extras2.revisarCapitulos();
         if (typeof Auto !== 'undefined') { Auto.latido(); Auto.evaluarReglas(); }
-        if (typeof Prestigio2 !== 'undefined') Prestigio2.revisarReliquias();
+        if (typeof Prestigio2 !== 'undefined') Prestigio2.revisarReliquias()
         if (typeof Economia !== 'undefined') { Economia.revisarEncargos(); Economia.registrarTiempoZona(3); }
         if (typeof Combate3 !== 'undefined') { Combate3.revisarFase(); Combate3.rotarClima(); }
         if (typeof Social !== 'undefined') Social.mostrarRetrato();
@@ -2006,7 +2021,10 @@ function updateTeamPkmn(){
         (team?.slot1?.pkmn?.id === undefined || pkmn[ team.slot1.pkmn?.id ].playerHp <= 0))
         {
 
-         
+        // el equipo ha caído: parte la cadena de Cacería, tumba la Torre y
+        // hace perder el botín sin cobrar de la Expedición
+        if (typeof Modos !== 'undefined') { try { Modos.alPerder() } catch(e) { console.error('Modos', e) } }
+
         leaveCombat();
         
         if (saved.autoRefight == true) {
@@ -2516,6 +2534,8 @@ function exploreCombatPlayer() {
     } else {
 
         barProgressPlayer = 0
+        // El Dorado tiene ventana de acciones: cada movimiento ejecutado la gasta
+        if (typeof Modos !== 'undefined' && saved.currentArea === 'doradoZona') { try { Modos.Dorado.alAtacar() } catch(e) {} }
         if (afkSeconds <= 0) voidAnimation(`pkmn-movebox-slot${currentTurn}-team-${exploreActiveMember}`, "moveboxFire 1 0.3s");
         
         team[exploreActiveMember].turn++;
@@ -4546,6 +4566,9 @@ function setWildAreas() {
 
     }
     updateDailyCounters()
+
+    // Cacería, El Dorado y Expedición se pintan arriba del listado
+    if (typeof PanelesModos !== 'undefined') { try { PanelesModos.pintarEnViajar() } catch(e) { console.error('Modos/UI', e) } }
 
 }
 
@@ -7064,6 +7087,10 @@ function updateVS() {
 
  if (document.getElementById(`vs-listing`).innerHTML == "") document.getElementById(`vs-listing`).innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:#ECDEB7; border-radius:0.3rem; height:15rem; width:15rem; text-align:center"><img alt="" src="img/pkmn/sprite/pikachuRockstar.png">¡Has derrotado a todos los entrenadores!<br><span style="font-size:0.9rem; opacity:0.7">¿Y si pruebas la Frontera de Combate?</span></div>`
 
+
+    // Señores: cinco jefes por rotación de 12 h
+    if (typeof PanelesModos !== 'undefined') { try { PanelesModos.pintarEnVs() } catch(e) { console.error('Modos/UI', e) } }
+
 }
 
 updateVS()
@@ -7648,6 +7675,10 @@ function updateFrontier() {
  //if (document.getElementById(`vs-listing`).innerHTML == "") document.getElementById(`vs-listing`).innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:#ECDEB7; border-radius:0.3rem; height:15rem; width:15rem; text-align:center"><img alt="" src="img/pkmn/sprite/pikachuRockstar.png">¡Has derrotado a todos los entrenadores!<br><span style="font-size:0.9rem; opacity:0.7">¿Y si pruebas la Frontera de Combate?</span></div>`
 
  
+
+    // Torre Infinita
+    if (typeof PanelesModos !== 'undefined') { try { PanelesModos.pintarEnFrontera() } catch(e) { console.error('Modos/UI', e) } }
+
 }
 
 
@@ -10682,6 +10713,11 @@ document.addEventListener('DOMContentLoaded', function() {
     loadGame();
     getSeed();
     seasonCheck();
+
+    // Modos nuevos: reconstruyen sus zonas desde saved.* Tiene que ir DESPUÉS
+    // de loadGame(), que reemplaza el objeto saved entero, y después de
+    // getSeed(), del que depende la rotación de los Señores.
+    if (typeof Modos !== 'undefined') { try { Modos.init() } catch(e) { console.error('Modos/init', e) } }
 
 
     if (saved.shopApricornMemoryRotationWhite == undefined) {

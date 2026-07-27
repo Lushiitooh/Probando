@@ -450,6 +450,7 @@ function injectPreviewTeam(){
 
 
     saved.currentArea = saved.currentAreaBuffer
+    if (typeof Modos !== 'undefined') { try { Modos.alEntrarEnZona(saved.currentArea) } catch(e) { console.error('Modos', e) } }
 
     if (saved.tutorial && saved.tutorialStep === "moves") {saved.tutorialStep = "battle"; openTutorial(); item.mysteryEgg.got++; item.mysteryEgg.newItem++ }
 

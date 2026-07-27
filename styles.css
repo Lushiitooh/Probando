@@ -7301,3 +7301,37 @@ button:focus-visible, select:focus-visible, input:focus-visible,
     font-size: 0.7rem; line-height: 1.1; font-weight: bold;
     pointer-events: none;
 }
+
+/* ---------------- modos de juego nuevos ---------------- */
+.ticket-caza      div:first-child { border-top: 3px solid #8e44ad; }
+.ticket-dorado    div:first-child { border-top: 3px solid #b8860b; }
+.ticket-expedicion div:first-child{ border-top: 3px solid #2e7d5b; }
+.ticket-senor     div:first-child { border-top: 3px solid #8b2f3f; }
+.ticket-torre     div:first-child { border-top: 3px solid #3d5a80; }
+
+/* selector de objetivo de cacería */
+.lista-caza { display: flex; flex-direction: column; gap: 0.25rem; max-height: 22rem; overflow-y: auto; }
+.fila-caza {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.3rem 0.5rem; border-radius: 0.4rem;
+    background: rgba(255,255,255,0.06); cursor: pointer;
+}
+.fila-caza:hover { background: rgba(130,223,96,0.18); }
+.fila-caza img { width: 2.6rem; image-rendering: pixelated; }
+.fila-caza small { opacity: 0.75; }
+
+/* nodos de la expedición */
+.lista-nodos { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.nodo-exp {
+    flex: 1 1 9rem; min-width: 9rem;
+    padding: 0.5rem; border-radius: 0.5rem; cursor: pointer;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+}
+.nodo-exp:hover { border-color: #82df60; background: rgba(130,223,96,0.15); }
+.nodo-premio {
+    display: flex; align-items: center; gap: 0.35rem;
+    margin-top: 0.4rem; padding-top: 0.35rem;
+    border-top: 1px solid rgba(255,255,255,0.15); font-size: 0.85rem;
+}
+.nodo-premio img { width: 2rem; image-rendering: pixelated; }
+.nodo-premio em { color: #82df60; font-style: normal; }
