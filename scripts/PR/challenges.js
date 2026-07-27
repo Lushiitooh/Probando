@@ -6,6 +6,9 @@
     AREA_ID: "customChallenge",
     MAX_TEAM: 6,
     MIN_TEAM: 1,
+    // Tope por linea de recompensa. Existe para que un cero de mas no
+    // reviente el inventario sin querer: cada unidad hace item.got++.
+    MAX_REWARD: 999,
   };
 
   const state = {
@@ -235,7 +238,7 @@
 
   const parseChallengeText = (raw) => {
     ensureNameMaps();
-    const result = { title: "", notes: "", playerTeam: [], enemyTeam: [], errors: [] };
+    const result = { title: "", notes: "", playerTeam: [], enemyTeam: [], errors: [], rewards: [] };
     const lines = raw.split(/\r?\n/);
     let current = null;
     let currentSide = null;
@@ -258,6 +261,31 @@
       const notesMatch = trimmed.match(/^notes:\s*(.+)$/i);
       if (notesMatch) {
         result.notes = notesMatch[1].trim();
+        return;
+      }
+
+      // Recompensa personalizada:  "Reward: 100 Chapa Plateada"  o  "Premio: Squirtle"
+      // Acepta cantidad opcional delante y nombres en español o en inglés, igual
+      // que los movimientos. Se pueden poner varias líneas.
+      const rewardMatch = trimmed.match(/^(?:reward|recompensa|premio):\s*(.+)$/i);
+      if (rewardMatch) {
+        const cuerpo = rewardMatch[1].trim();
+        const conCantidad = cuerpo.match(/^(\d+)\s*[x×]?\s+(.+)$/) || cuerpo.match(/^(.+?)\s*[x×]\s*(\d+)$/);
+        let cantidad = 1, nombre = cuerpo;
+        if (conCantidad) {
+          if (/^\d+$/.test(conCantidad[1])) { cantidad = parseInt(conCantidad[1], 10); nombre = conCantidad[2]; }
+          else { nombre = conCantidad[1]; cantidad = parseInt(conCantidad[2], 10); }
+        }
+        nombre = nombre.trim();
+        const idObjeto = nameMaps.items[normalize(nombre)];
+        const idPkmn   = nameMaps.pokemon[normalize(nombre)];
+        if (!idObjeto && !idPkmn) {
+          result.errors.push(`Recompensa desconocida: ${nombre}`);
+        } else if (!(cantidad >= 1) || cantidad > CONFIG.MAX_REWARD) {
+          result.errors.push(`Cantidad no válida para ${nombre}: usa entre 1 y ${CONFIG.MAX_REWARD}.`);
+        } else {
+          result.rewards.push({ id: idObjeto || idPkmn, esPkmn: !idObjeto, amount: idObjeto ? cantidad : 1 });
+        }
         return;
       }
 
@@ -335,10 +363,17 @@
   const renderPreview = (parseResult) => {
     const preview = document.getElementById("custom-challenge-preview");
     if (!preview) return;
+    // La recompensa se lee del reto, no se inventa. Antes esta linea decia
+    // siempre "1 Bottle Cap" aunque el reto no diera absolutamente nada.
+    const rs = parseResult.rewards || [];
+    const textoRecompensa = rs.length
+      ? rs.map(r => (r.esPkmn ? format(r.id) : `${r.amount} × ${format(r.id)}`)).join(", ")
+      : "ninguna (añade una línea <code>Recompensa: 100 Chapa Plateada</code>)";
+
     preview.innerHTML = `
       <strong>Grupo del jugador:</strong> ${formatTeamPreview(parseResult.playerTeam)}<br>
       <strong>Equipo enemigo:</strong> ${formatTeamPreview(parseResult.enemyTeam)}<br>
-      <strong>Recompensa:</strong> 1 Bottle Cap
+      <strong>Recompensa:</strong> ${textoRecompensa}
     `;
   };
 
@@ -427,6 +462,7 @@ IVs: 0 HP / 0 Atk / 0 Def / 6 SpA / 6 SpD / 6 Spe
       rawText,
       playerTeam: parseResult.playerTeam,
       enemyTeam: parseResult.enemyTeam,
+      rewards: parseResult.rewards || [],
       imported: existing?.imported || false
     };
 
@@ -596,10 +632,25 @@ IVs: 0 HP / 0 Atk / 0 Def / 6 SpA / 6 SpD / 6 Spe
     state.snapshot = snapshotTeam();
     state.pkmnSnapshots = {};
 
+    // Retos principales: siguen usando area.reward (una unidad de cada cosa).
+    // Retos personalizados: usan area.itemReward, que SI admite cantidad
+    // (explore.js:448-476), asi que se puede pedir "100 Chapa Plateada".
+    // Antes esta rama estaba cerrada con isMainChallenge y cualquier reto
+    // propio se quedaba sin premio, aunque la vista previa anunciara uno.
+    delete area.reward;
+    delete area.itemReward;
+
     if (challenge.isMainChallenge && Array.isArray(challenge.reward)) {
       area.reward = [...challenge.reward];
-    } else {
-      delete area.reward;
+    } else if (Array.isArray(challenge.rewards) && challenge.rewards.length) {
+      const objetos = {}, criaturas = [];
+      let n = 0;
+      for (const r of challenge.rewards) {
+        if (r.esPkmn) { criaturas.push({ id: r.id }); continue; }
+        objetos[++n] = { item: r.id, amount: Math.max(1, r.amount || 1) };
+      }
+      if (n) area.itemReward = objetos;
+      if (criaturas.length) area.reward = criaturas;
     }
 
     const uniqueIds = new Set([
@@ -786,6 +837,33 @@ IVs: 0 HP / 0 Atk / 0 Def / 6 SpA / 6 SpD / 6 Spe
     `;
 
     let rewardBlock;
+
+    // Recompensas de un reto personalizado, con su cantidad encima del icono.
+    if (!challenge.isMainChallenge && Array.isArray(challenge.rewards) && challenge.rewards.length) {
+      rewardBlock = document.createElement("div");
+      rewardBlock.className = "custom-challenge-card-reward";
+      rewardBlock.innerHTML = "<strong>Recompensa:</strong>";
+
+      const caja = document.createElement("div");
+      caja.className = "custom-challenge-reward-items";
+
+      challenge.rewards.forEach((r) => {
+        if (!r || !r.id) return;
+        if (item[r.id] === undefined && pkmn[r.id] === undefined) return;
+
+        const el = document.createElement("div");
+        el.className = "custom-challenge-reward-item";
+        el.title = (r.esPkmn ? "" : r.amount + " × ") + format(r.id);
+
+        const carpeta = r.esPkmn ? "pkmn/sprite" : "items";
+        el.innerHTML = `<img src="img/${carpeta}/${r.id}.png" alt="${format(r.id)}">`
+                     + (!r.esPkmn && r.amount > 1 ? `<span class="reward-cantidad">${r.amount}</span>` : "");
+        caja.appendChild(el);
+      });
+
+      rewardBlock.appendChild(caja);
+    }
+
     if (challenge.isMainChallenge && Array.isArray(challenge.reward) && challenge.reward.length) {
       rewardBlock = document.createElement("div");
       rewardBlock.className = "custom-challenge-card-reward";

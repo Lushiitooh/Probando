@@ -7291,3 +7291,13 @@ button:focus-visible, select:focus-visible, input:focus-visible,
     outline: 3px solid #82df60;
     outline-offset: 2px;
 }
+
+/* cantidad sobre el icono de recompensa de un reto personalizado */
+.custom-challenge-reward-item { position: relative; }
+.custom-challenge-reward-item .reward-cantidad {
+    position: absolute; right: -0.2rem; bottom: -0.2rem;
+    background: #2b2b2b; color: #fff; border: 1px solid #82df60;
+    border-radius: 0.6rem; padding: 0 0.25rem;
+    font-size: 0.7rem; line-height: 1.1; font-weight: bold;
+    pointer-events: none;
+}
