@@ -291,6 +291,103 @@ API.panelTorre = function () {
 API.entrarTorre = function () { try { closeTooltip(); } catch (e) {} Modos.Torre.iniciar(); };
 
 
+/* ------------------------------------- paneles de los sistemas de progreso */
+
+API.panelProgreso = function () {
+    if (typeof Progreso2 === 'undefined') return;
+    const s = Progreso2.Suerte.resumen();
+
+    // las 12 especies mas buscadas
+    const B = Progreso2.Busqueda.estado();
+    const top = Object.keys(B).sort((a,b) => B[b]-B[a]).slice(0, 12);
+
+    let html = `<h3>Suerte</h3>
+        <p>Tiradas de variocolor: <strong>${s.tiradas.toLocaleString('es')}</strong> ·
+        conseguidos: <strong>${s.shinies}</strong></p>
+        <p>Llevas <strong>${s.sinShiny.toLocaleString('es')}</strong> tiradas sin uno.
+        ${s.piedad > 1
+            ? `La piedad ya multiplica tu probabilidad por <strong>x${s.piedad.toFixed(1)}</strong>.`
+            : `La piedad empieza a los ${Progreso2.Suerte.PIEDAD_DESDE.toLocaleString('es')} (faltan ${s.faltanParaPiedad.toLocaleString('es')}).`}
+        Garantizado en <strong>${s.garantizadoEn.toLocaleString('es')}</strong> tiradas más.</p>
+        <p style="opacity:0.8">Peor racha: ${s.mejorRacha.toLocaleString('es')} tiradas seguidas sin nada.</p>`;
+
+    html += `<h3>Nivel de búsqueda</h3>`;
+    if (!top.length) {
+        html += `<p>Aún no has derrotado salvajes. Cada derrota deja huella permanente
+                 en esa especie: baja su denominador de variocolor y mejora sus IV.</p>`;
+    } else {
+        html += '<div class="lista-caza">' + top.map(id => {
+            const n = Progreso2.Busqueda.nivel(id);
+            const den = Math.round(Progreso2.Busqueda.denominadorShiny(id));
+            const a = Progreso2.Aura.de(id);
+            return `<div class="fila-caza">
+                <img src="img/pkmn/sprite/${id}.png" alt="">
+                <span><strong>${nom(id)}</strong>${a ? ` <em style="color:${a.color}">${a.nombre}</em>` : ''}<br>
+                <small>Búsqueda ${n}/999 · variocolor 1/${den}</small></span>
+            </div>`;
+        }).join('') + '</div>';
+    }
+
+    const p = Progreso2.Profundidad;
+    html += `<h3>Profundidad de zona</h3>
+        <p>Nivel actual: <strong>${p.nivel()}/${p.TOPE}</strong> ·
+        rivales +${Math.round((p.multNivel()-1)*100)} % de nivel ·
+        botín +${Math.round((p.multBotin()-1)*100)} % ·
+        experiencia +${Math.round((p.multExp()-1)*100)} %</p>
+        <p style="opacity:0.8">Sube un tramo cada ${p.POR_TRAMO} derrotas sin salir de la zona.
+        Salir lo reinicia.</p>`;
+
+    // maestrias
+    const M = Progreso2.Maestria.estado();
+    const tm = Object.keys(M).sort((a,b)=>M[b]-M[a]).slice(0, 8);
+    html += `<h3>Maestría de movimientos</h3>`;
+    html += tm.length
+        ? '<p>' + tm.map(m => {
+            const pr = Progreso2.Maestria.progreso(m);
+            return `${nom(m)} <strong>nv.${pr.nivel}</strong> (+${pr.nivel*4} %)` +
+                   (pr.siguiente ? ` <small>${pr.usos}/${pr.siguiente}</small>` : ' <small>máximo</small>');
+          }).join(' · ') + '</p>'
+        : '<p>Los usos suben el movimiento, no al Pokémon. Aún no has usado ninguno.</p>';
+
+    abrir('Progreso', html);
+};
+
+API.panelLinaje = function () {
+    if (typeof Progreso2 === 'undefined') return;
+    const L = Progreso2.Linaje.estado();
+    const fams = Object.keys(L).sort((a,b) => Progreso2.Linaje.puntos(b) - Progreso2.Linaje.puntos(a)).slice(0, 25);
+
+    let html = `<p>Cada familia evolutiva guarda el <strong>mejor IV que has visto</strong> en
+        cada estadística, y todo ejemplar nuevo de esa familia nace ya con esos valores
+        como mínimo. Así evolucionar deja de devolverte un Pokémon inútil, y el duplicado
+        número 40 sigue sirviendo para algo.</p>`;
+
+    if (!fams.length) { html += '<p>Aún no hay récords. Captura algo para empezar.</p>'; }
+    else {
+        html += '<div class="lista-caza">' + fams.map(r => {
+            const v = L[r], pts = Progreso2.Linaje.puntos(r);
+            return `<div class="fila-caza">
+                <img src="img/pkmn/sprite/${r}.png" alt="">
+                <span><strong>${nom(r)}</strong> <small>${pts}/36</small><br>
+                <small>PS ${v.hp} · At ${v.atk} · Def ${v.def} · AtEsp ${v.satk} · DefEsp ${v.sdef} · Vel ${v.spe}</small></span>
+            </div>`;
+        }).join('') + '</div>';
+    }
+
+    // caramelos disponibles
+    const C = Progreso2.Caramelos.estado();
+    const conC = Object.keys(C).filter(k => C[k].n > 0);
+    html += `<h3>Caramelos de especie</h3>`;
+    html += conC.length
+        ? '<p>' + conC.map(r => `${nom(r)}: <strong>${C[r].n}</strong>`).join(' · ') + '</p>'
+        : `<p>La experiencia de un Pokémon a nivel 100 se tiraba entera. Ahora se convierte
+           en caramelos de su familia, que suben de nivel a cualquier pariente.
+           Hacen falta ${Progreso2.Caramelos.POR_CARAMELO.toLocaleString('es')} de experiencia por caramelo.</p>`;
+
+    abrir('Linaje', html);
+};
+
+
 /* ------------------------------------------------------------- auxiliar */
 
 function abrir(titulo, html) {

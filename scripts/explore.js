@@ -197,6 +197,7 @@ let wildPkmnHpMax;
 let wildLevel = 0
 
 let currentTrainerSlot = 1
+let wildAuraActual = null   // aura del salvaje actual, si la tiene
 
 let currentTrainingWave = 0
 
@@ -535,6 +536,16 @@ for (let i = 0; i < 4; i++) {
     if (rng(0.01) && areas[saved.currentArea].spawns.rare) spawnedPkmn = arrayPick(areas[saved.currentArea].spawns.rare).id
 
     if (areas[saved.currentArea].spawns.common == undefined) spawnedPkmn = arrayPick(areas[saved.currentArea].spawns.rare).id
+
+    // Profundidad de zona: quedarse la va endureciendo por tramos de 25 KO.
+    // Aura: una especie muy derrotada empieza a aparecer mejorada.
+    // Ambas suben el nivel, que es lo que multiplica el daño y la experiencia.
+    if (typeof Progreso2 !== 'undefined') { try {
+        wildLevel = Math.round(wildLevel * Progreso2.Profundidad.multNivel())
+        const _a = Progreso2.Aura.sortear(spawnedPkmn)
+        if (_a) { wildLevel += _a.nivel; wildAuraActual = _a } else { wildAuraActual = null }
+        if (wildLevel > 100) wildLevel = 100
+    } catch(e) { wildAuraActual = null } }
 
 
     // picks amount of moves based on level
@@ -1050,6 +1061,17 @@ function leaveCombat(){
     let rarePkmnChance = 0.01
     let shinyPkmnChance = 1/400
     let shinyPkmnChanceEncounter = 1/120
+    // Nivel de búsqueda por especie y piedad por mala racha: el denominador
+    // baja con los encuentros acumulados de ESA especie y, pasadas 1.500
+    // tiradas sin nada, la probabilidad sube hasta garantizarlo.
+    if (typeof Progreso2 !== 'undefined') { try {
+        const _id = spawnedPkmn
+        if (_id) { const _den = Progreso2.Busqueda.denominadorShiny(_id)
+                   shinyPkmnChance = 1/_den; shinyPkmnChanceEncounter = 1/(_den/3.33) }
+        const _pi = Progreso2.Suerte.multPiedad()
+        if (_pi > 1) { shinyPkmnChance *= _pi; shinyPkmnChanceEncounter *= _pi }
+        Progreso2.Suerte.tirar()
+    } catch(e) {} }
     // la cadena de Cacería multiplica la probabilidad de variocolor
     if (typeof Modos !== 'undefined') { try { const mc = Modos.Caza.multShiny()
         if (mc > 1) { shinyPkmnChance *= mc; shinyPkmnChanceEncounter *= mc } } catch(e) {} }
@@ -1132,6 +1154,12 @@ function leaveCombat(){
     divPkmn.dataset.pkmnEditor = hatchedPkmn
 
     pkmn[hatchedPkmn].caught++
+    // linaje: suelo de IV de la familia, y se apunta el récord
+    if (typeof Progreso2 !== 'undefined') { try {
+        const _s = Progreso2.Busqueda.sueloIv(hatchedPkmn)
+        if (_s) for (const _k in pkmn[hatchedPkmn].ivs) if (pkmn[hatchedPkmn].ivs[_k] < _s) pkmn[hatchedPkmn].ivs[_k] = _s
+        Progreso2.alObtener(hatchedPkmn)
+    } catch(e) {} }
     if (typeof Modos !== 'undefined') { try { Modos.Caza.mejorarEjemplar(hatchedPkmn) } catch(e) {} }
 
     if (saved.hideGotPkmn == "true" && divTag=="") continue
@@ -1543,6 +1571,8 @@ for (let i = activeBars; i < hpBars.length; i++) {
     // los modos nuevos se enganchan aquí: cadena de caza, piso de torre,
     // racha de los Señores y aparición de rastros dorados
     if (typeof Modos !== 'undefined') { try { Modos.alDerrotarSalvaje() } catch(e) { console.error('Modos', e) } }
+    // nivel de búsqueda por especie y profundidad de zona
+    if (typeof Progreso2 !== 'undefined') { try { Progreso2.alDerrotarSalvaje(saved.currentPkmn) } catch(e) { console.error('Progreso2', e) } }
 
 
 
@@ -1624,6 +1654,7 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (typeof Combate2 !== 'undefined') baseExpGain *= Combate2.multSinergia('expPct') * Combate2.multBendicion('expPct')
     if (typeof Extras2 !== 'undefined') baseExpGain *= Extras2.multEvento('expPct')
     if (typeof Prestigio2 !== 'undefined') baseExpGain *= Prestigio2.multReliquias('expPct')
+    if (typeof Progreso2 !== 'undefined') baseExpGain *= Progreso2.Profundidad.multExp()
 
     let expGained = 0
     if ( wildLevel > (pkmn[ team[exploreActiveMember].pkmn.id ].level-10) ) { expGained = baseExpGain ;}
@@ -1632,7 +1663,14 @@ for (let i = activeBars; i < hpBars.length; i++) {
     if (wildLevel >= pkmn[ team[exploreActiveMember].pkmn.id ].level + 20) { expGained = baseExpGain*12 }
     if (wildLevel >= pkmn[ team[exploreActiveMember].pkmn.id ].level + 40) { expGained = baseExpGain*64 }
     if (wildLevel >= pkmn[ team[exploreActiveMember].pkmn.id ].level + 50) { expGained = baseExpGain*128 }
-    if (pkmn[ team[exploreActiveMember].pkmn.id ].level==100) expGained = 0
+    // a nivel 100 la experiencia se tiraba entera; ahora se convierte en
+    // caramelos de esa familia evolutiva, que suben de nivel a cualquier pariente
+    if (pkmn[ team[exploreActiveMember].pkmn.id ].level==100) {
+        if (typeof Progreso2 !== 'undefined') { try {
+            Progreso2.Caramelos.ingresar(team[exploreActiveMember].pkmn.id, expGained)
+        } catch(e) {} }
+        expGained = 0
+    }
 
 
     if (team[exploreActiveMember].item==="luckyEgg") expGained *= (item.luckyEgg.power() /100) +1
@@ -1922,6 +1960,11 @@ for (const i in team) {
         if (pkmn[ team[i].pkmn.id ].level >= pkmn[team[i].pkmn.id].evolve()[1].level && pkmn[ pkmn[team[i].pkmn.id].evolve()[1].pkmn.id ].caught===0) {
 
                 givePkmn(pkmn[ pkmn[team[i].pkmn.id].evolve()[1].pkmn.id ],1)
+                // la evolución hereda parte del nivel del padre y el suelo de
+                // IV de la familia: evolucionar deja de ser volver a empezar
+                if (typeof Progreso2 !== 'undefined') { try {
+                    Progreso2.Herencia.aplicar(team[i].pkmn.id, pkmn[team[i].pkmn.id].evolve()[1].pkmn.id)
+                } catch(e) {} }
 
         } 
 
@@ -2534,6 +2577,8 @@ function exploreCombatPlayer() {
     } else {
 
         barProgressPlayer = 0
+        // maestría: los usos suben el MOVIMIENTO, no al Pokémon
+        if (typeof Progreso2 !== 'undefined') { try { Progreso2.Maestria.usar(nextMovePlayer) } catch(e) {} }
         // El Dorado tiene ventana de acciones: cada movimiento ejecutado la gasta
         if (typeof Modos !== 'undefined' && saved.currentArea === 'doradoZona') { try { Modos.Dorado.alAtacar() } catch(e) {} }
         if (afkSeconds <= 0) voidAnimation(`pkmn-movebox-slot${currentTurn}-team-${exploreActiveMember}`, "moveboxFire 1 0.3s");
@@ -2855,6 +2900,8 @@ function exploreCombatPlayer() {
         if (team[exploreActiveMember].item == item.choiceBand.id && nextMove.split == 'physical') totalPower *= item.choiceBand.power()
         
         if (team[exploreActiveMember].item == item.lifeOrb.id) totalPower *= item.lifeOrb.power()
+        // maestría del movimiento: +4 % por nivel, hasta +20 %
+        if (typeof Progreso2 !== 'undefined') { try { totalPower *= Progreso2.Maestria.mult(nextMove.id) } catch(e) {} }
         if (team[exploreActiveMember].item == item.ejectButton.id) totalPower *= item.ejectButton.power()
         if (team[exploreActiveMember].item == item.ejectPack.id) totalPower *= item.ejectPack.power()
 
@@ -10718,6 +10765,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // de loadGame(), que reemplaza el objeto saved entero, y después de
     // getSeed(), del que depende la rotación de los Señores.
     if (typeof Modos !== 'undefined') { try { Modos.init() } catch(e) { console.error('Modos/init', e) } }
+    if (typeof Progreso2 !== 'undefined') { try { Progreso2.init() } catch(e) { console.error('Progreso2/init', e) } }
 
 
     if (saved.shopApricornMemoryRotationWhite == undefined) {
