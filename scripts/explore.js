@@ -2446,6 +2446,10 @@ function exploreCombatPlayer() {
     if (nextMoveBoxPlayer != document.getElementById(`pkmn-movebox-slot${currentTurn}-team-${exploreActiveMember}`)) nextMoveBoxPlayer = document.getElementById(`pkmn-movebox-slot${currentTurn}-team-${exploreActiveMember}`);
     if (nextMovePlayer != nextMoveBoxPlayer?.dataset?.move) nextMovePlayer = nextMoveBoxPlayer?.dataset?.move;
     if (moveTimerPlayer != move[nextMovePlayer]?.timer) moveTimerPlayer = move[nextMovePlayer]?.timer; 
+    // Estilos: Ágil acorta la carga, Fuerte la alarga
+    if (typeof Estilos !== 'undefined' && moveTimerPlayer) { try {
+        moveTimerPlayer *= Estilos.multTiempo(team[exploreActiveMember].pkmn.id, currentTurn, nextMovePlayer)
+    } catch(e) {} }
     if (barPlayer != document.getElementById(`pkmn-movebox-slot${currentTurn}-team-${exploreActiveMember}-bar`)) barPlayer = document.getElementById(`pkmn-movebox-slot${currentTurn}-team-${exploreActiveMember}-bar`);
 
     //rotation reset
@@ -2579,6 +2583,7 @@ function exploreCombatPlayer() {
         barProgressPlayer = 0
         // maestría: los usos suben el MOVIMIENTO, no al Pokémon
         if (typeof Progreso2 !== 'undefined') { try { Progreso2.Maestria.usar(nextMovePlayer) } catch(e) {} }
+        else if (typeof Estilos !== 'undefined') { try { Estilos.contar(nextMovePlayer) } catch(e) {} }
         // El Dorado tiene ventana de acciones: cada movimiento ejecutado la gasta
         if (typeof Modos !== 'undefined' && saved.currentArea === 'doradoZona') { try { Modos.Dorado.alAtacar() } catch(e) {} }
         if (afkSeconds <= 0) voidAnimation(`pkmn-movebox-slot${currentTurn}-team-${exploreActiveMember}`, "moveboxFire 1 0.3s");
@@ -2685,8 +2690,18 @@ function exploreCombatPlayer() {
             if (areas[saved.currentArea].id == areas.training.id) defenderStars = returnDivisionStars(defender)
             //if (saved.weatherTimer>0 && saved.weather=="weirdRoom") defenderStars = Math.max(defenderStars-3,1)
 
+            // Estilos de rotación: el multiplicador entra en el lado ATACANTE
+            // (movePower y attackerStars), NO sobre totalPower. Si se aplicara
+            // fuera, se cancelaría en el cociente daño/tiempo y Ágil ganaría
+            // siempre: no habría decisión. Dentro, el muro de la defensa no
+            // escala y aparece un punto de cruce real hacia 3 estrellas.
+            let _es = { dano: 1, defensa: 1 }
+            if (typeof Estilos !== 'undefined') { try {
+                _es = Estilos.mods(attacker.id, team[exploreActiveMember].turn, nextMove.id)
+            } catch(e) {} }
+
             totalPower = 
-            ( movePower + Math.max(0, ( (attackerStars * 30) * Math.pow(1.1, attacker.ivs.atk) ) - (defenderStars * 30) )  )
+            ( (movePower * _es.dano) + Math.max(0, ( (attackerStars * 30 * _es.dano) * Math.pow(1.1, attacker.ivs.atk) ) - (defenderStars * 30 * _es.defensa) )  )
             * ( 1+(attacker.level * 0.1) )        
             * 1;
 
@@ -2902,6 +2917,9 @@ function exploreCombatPlayer() {
         if (team[exploreActiveMember].item == item.lifeOrb.id) totalPower *= item.lifeOrb.power()
         // maestría del movimiento: +4 % por nivel, hasta +20 %
         if (typeof Progreso2 !== 'undefined') { try { totalPower *= Progreso2.Maestria.mult(nextMove.id) } catch(e) {} }
+        // armadura de El Dorado: los movimientos que no son de un tipo grieta
+        // hacen el 15 %. Sin esto las grietas eran puramente decorativas.
+        if (typeof Modos !== 'undefined') { try { totalPower *= Modos.Dorado.multArmadura(moveType) } catch(e) {} }
         if (team[exploreActiveMember].item == item.ejectButton.id) totalPower *= item.ejectButton.power()
         if (team[exploreActiveMember].item == item.ejectPack.id) totalPower *= item.ejectPack.power()
 
@@ -10766,6 +10784,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // getSeed(), del que depende la rotación de los Señores.
     if (typeof Modos !== 'undefined') { try { Modos.init() } catch(e) { console.error('Modos/init', e) } }
     if (typeof Progreso2 !== 'undefined') { try { Progreso2.init() } catch(e) { console.error('Progreso2/init', e) } }
+    if (typeof Estilos !== 'undefined') { try { Estilos.init() } catch(e) { console.error('Estilos/init', e) } }
 
 
     if (saved.shopApricornMemoryRotationWhite == undefined) {

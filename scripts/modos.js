@@ -624,6 +624,29 @@ Dorado.preparar = function () {
 /** Ventana de acciones: al agotarse, huye. */
 Dorado.VENTANA = 16;
 
+/**
+ * La armadura, que es lo que hace al modo.
+ *
+ * Cuidado: la premisa original ("la defensa resta, así que un rival con
+ * defensa altísima anula el daño normal") es FALSA en este motor. La fórmula
+ * (explore.js:2688) deja movePower FUERA del max(), así que la defensa solo
+ * cancela el término de estadísticas y el golpe siempre pasa. Sin esto, las
+ * grietas eran decorativas: el panel las anunciaba y no hacían nada.
+ *
+ * Así que la armadura se aplica explícitamente: un movimiento que no sea de
+ * un tipo grieta hace el 15 % del daño. Con dos grietas la rotación
+ * grieta1/grieta2/grieta1/grieta2 encadena además la Potencia Cruzada en los
+ * cuatro movimientos, así que el modo enseña el cruce sin explicarlo.
+ */
+Dorado.PENALIZACION = 0.15;
+
+Dorado.multArmadura = function (tipoMovimiento) {
+    if (saved.currentArea !== 'doradoZona') return 1;
+    const d = Dorado.estado();
+    if (!d.grietas || !d.grietas.length) return 1;
+    return d.grietas.indexOf(tipoMovimiento) >= 0 ? 1 : Dorado.PENALIZACION;
+};
+
 Dorado.entrar = function () {
     const d = Dorado.estado();
     if (d.rastros <= 0) return false;
