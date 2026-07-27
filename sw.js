@@ -6,7 +6,10 @@
      - Las imágenes van por caché primero: son 20 MB que nunca cambian.
 */
 
-const VERSION = 'pokechill-v1';
+// Al subir este número, el evento activate borra todas las cachés anteriores.
+// Hay que subirlo cuando cambie la forma de cachear, para que nadie se quede
+// con una caché envenenada de la versión anterior.
+const VERSION = 'pokechill-v2';
 const CASCARA = [
   './', './index.html', './styles.css',
   './scripts/HackTimer.js', './scripts/fuse.js',
@@ -55,12 +58,16 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // red primero para el código: así las actualizaciones se ven al recargar
+  // Red primero para el código, y BYPASSEANDO la caché HTTP del navegador.
+  // Sin el cache:'reload' esto no funcionaba: el fetch de aquí dentro se
+  // resolvía contra la caché del navegador y devolvía el archivo viejo, que
+  // además se volvía a guardar. Resultado: publicabas un cambio, recargabas,
+  // y seguías ejecutando el código de antes sin ninguna pista de por qué.
   e.respondWith(
-    fetch(req).then(res => {
+    fetch(req, { cache: 'reload' }).then(res => {
       const copia = res.clone();
       caches.open(VERSION).then(c => c.put(req, copia));
       return res;
-    }).catch(() => caches.match(req))
+    }).catch(() => fetch(req).catch(() => caches.match(req)))
   );
 });
